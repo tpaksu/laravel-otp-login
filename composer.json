@@ -1,0 +1,14 @@
+{
+    "name": "tpaksu/laravel-otp-login",
+    "authors": [
+        {
+            "name": "Taha PAKSU",
+            "email": "tpaksu@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "tpaksu\\LaravelOTPLogin\\": "src/"
+        }
+    }
+}
