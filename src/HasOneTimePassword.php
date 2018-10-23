@@ -10,7 +10,7 @@ trait HasOneTimePassword
     {
         $opt->create([
             'user_id' => $this->id,
-            'status'  => 'clean-sheet'
+            'status' => 'clean-sheet'
         ]);
     }
 
@@ -20,7 +20,7 @@ trait HasOneTimePassword
 
         if ($opt->count() == 0) {
             $this->initOTP($opt);
-            $opt = $this->hasOne(OneTimePassword::class , "user_id", "id");
+            $opt = $this->hasOne(OneTimePassword::class, "user_id", "id");
         }
         return $opt;
     }
