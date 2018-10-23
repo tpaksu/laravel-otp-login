@@ -10,5 +10,15 @@
         "psr-4": {
             "tpaksu\\LaravelOTPLogin\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "tpaksu\\LaravelOTPLogin\\ServiceProvider"
+            ],
+            "aliases": {
+                "OTPLogin": "tpaksu\\LaravelOTPLogin\\Facade"
+            }
+        }
     }
 }
