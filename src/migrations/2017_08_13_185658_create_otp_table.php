@@ -13,14 +13,14 @@ class CreateOtpTable extends Migration
      */
     public function up()
     {
-        Schema::create('OTP_passwords', function (Blueprint $table) {
+        Schema::create('one_time_passwords', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger("user_id")->index();
             $table->string('status')->index();
             $table->timestamps();
         });
 
-        Schema::table('OTP_passwords', function (Blueprint $table) {
+        Schema::table('one_time_passwords', function (Blueprint $table) {
             $table->foreign('user_id') ->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -32,6 +32,6 @@ class CreateOtpTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('OTP_passwords');
+        Schema::dropIfExists('one_time_passwords');
     }
 }

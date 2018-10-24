@@ -13,7 +13,7 @@ class CreateOtpLogsTable extends Migration
      */
     public function up()
     {
-        Schema::create('OTP_logs', function (Blueprint $table) {
+        Schema::create('one_time_password_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger("user_id")->index();
             $table->string('otp_code')->index();
@@ -22,7 +22,7 @@ class CreateOtpLogsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('OTP_logs', function (Blueprint $table) {
+        Schema::table('one_time_password_logs', function (Blueprint $table) {
             $table->foreign('user_id') ->references('id')->on('users')->onDelete('cascade');
         });
     }
@@ -34,6 +34,6 @@ class CreateOtpLogsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('OTP_logs');
+        Schema::dropIfExists('one_time_password_logs');
     }
 }

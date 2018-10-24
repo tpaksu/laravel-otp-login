@@ -17,8 +17,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/views', 'laravel-otp-login');
 
-        $this->publishes([__DIR__ . '/config/config.php' => config_path('otp-login.php')], "config");
-        $this->publishes([__DIR__.'/views/auth' => resource_path('views/vendor/laravel-otp-login')], "views");
+        $this->publishes([__DIR__ . '/config/config.php' => config_path('otp.php')], "config");
+        $this->publishes([__DIR__.'/views' => resource_path('views/vendor/laravel-otp-login')], "views");
         $this->publishes([__DIR__ . '/migrations' => database_path('migrations')], "migrations");
 
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);

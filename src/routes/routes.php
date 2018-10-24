@@ -1,8 +1,11 @@
 <?php
 
-//Route::group(['middleware' => ['auth']], function () {
-    // impersonation
-    Route::get('/login/otp/check', function (Request $request) {
-        return view("laravel-otp-login::auth.otpvalidate");
+Route::group(['middleware' => ['web', 'auth']], function () {
+    Route::get('/login/verify', function (Request $request) {
+        dd("taha");
+        return view("laravel-otp-login::otpvalidate");
     })->name("otp.login");
-//});
+    Route::get('/login/check', function (Request $request) {
+
+    })->name("otp.check");
+});
