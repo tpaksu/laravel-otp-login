@@ -1,45 +1,31 @@
-@extends('layouts.app')
+@extends('layouts.login')
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="email" class="col-sm-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control{{ isset($errors) && $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
-                                @if(isset($errors))
-                                @if ($errors->has('email'))
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
-
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Your Password?') }}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="row">
+        <div class="col col-login mx-auto">
+            <div class="text-center mb-6">
+                <img src="{{asset('assets/images/provas_male.png')}}" class="h-9" alt="">
             </div>
+            <form method="POST" action="{{ route('otp.verify') }}" class="card" aria-label="{{ __('Verify') }}">
+                @csrf
+                <div class="card-body p-6">
+                    <div class="card-title">@lang("Verify Your Phone number")</div>
+					<p>Thanks for giving your details. An OTP has been sent to your Mobile Number. Please enter the {{config("otp.otp_digit_length", 6)}} digit OTP below for Successful Login</p>
+                    <div class="form-group">
+                        <label class="form-label">@lang("OTP")</label>
+                        <input id="code" type="text" class="form-control{{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" value="{{ old('code') }}"
+                            required autofocus> @if ($errors->has('code'))
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $errors->first('code') }}</strong>
+                        </span>
+                        @endif
+                    </div>                    
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-primary btn-block">@lang("Verify Phone Number")</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
