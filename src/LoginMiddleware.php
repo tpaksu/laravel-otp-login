@@ -61,10 +61,6 @@ class LoginMiddleware
                     return redirect(route('login'));
                 }
             }
-        } else if (\Auth::check() && $routeName == "logout") {
-            OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function($otp){
-                $otp->discardOldPasswords();
-            });
         }
         return $next($request);
     }

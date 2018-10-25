@@ -23,5 +23,11 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);
 
+        \Event::listen('Illuminate\Auth\Events\Logout', function($user)
+        {
+            OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function($otp){
+                $otp->discardOldPasswords();
+            });
+        });
     }
 }
