@@ -15,22 +15,22 @@ class LoginMiddleware
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {		
-		$routeName = $request->route()->getName();
+    {
+        $routeName = $request->route()->getName();
         if (\Auth::check() && !in_array($routeName, ['otp.view', 'otp.verify', 'logout'])) {
             $user = \Auth::user();
-            $otp = OneTimePassword::whereUserId($user->id);
+            $otp = OneTimePassword::whereUserId($user->id)->where("status", "<>", "discarded");
             $needsRefresh = false;
             if ($otp->count() > 0) {
                 $otp = $otp->orderByDesc("created_at")->first();
                 if ($otp->status == "waiting") {
                     // check timeout
-                    if($otp->status < Carbon::now()->subSeconds(config("otp.otp_timeout"))){
+                    if ($otp->status < Carbon::now()->subSeconds(config("otp.otp_timeout"))) {
                         // expired.
-                        OneTimePassword::whereUserId($user->id)->delete();
+                        $otp->discardOldPasswords();
                         // needs to login again.
-						\Auth::logout();                        
-                    }else{
+                        \Auth::logout();
+                    } else {
                         // still valid. redirect to login verify screen
                         return redirect(route("otp.view"));
                     }
@@ -39,26 +39,33 @@ class LoginMiddleware
                     return $next($request);
                 } else {
                     // invalid status
-                    OneTimePassword::whereUserId($user->id)->delete();
                     // needs to login again.
-					\Auth::logout();      
+                    \Auth::logout();
+                    return redirect("/");
                 }
-            } else {               
+            } else {
                 // needs a new verification
                 $needsRefresh = true;
             }
 
-            if($needsRefresh){
+            if ($needsRefresh) {
                 $otp = OneTimePassword::create([
                     "user_id" => $user->id,
                     "status" => "waiting"
                 ]);
-                $otp->send();
-                return redirect(route('otp.view'));
+                if($otp->send() == true){
+                    return redirect(route('otp.view'));
+                }else{
+                    $otp->discardOldPasswords();
+                    \Auth::logout();
+                    return redirect(route('login'));
+                }
             }
-        }else if(\Auth::check() && $routeName == "logout"){			
-			OneTimePassword::whereUserId(\Auth::user()->id)->delete();
-		}
+        } else if (\Auth::check() && $routeName == "logout") {
+            OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function($otp){
+                $otp->discardOldPasswords();
+            });
+        }
         return $next($request);
     }
 }

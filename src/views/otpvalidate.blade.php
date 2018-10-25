@@ -20,7 +20,7 @@
                             <strong>{{ $errors->first('code') }}</strong>
                         </span>
                         @endif
-                    </div>                    
+                    </div>
                     <div class="form-footer">
                         <button type="submit" class="btn btn-primary btn-block">@lang("Verify Phone Number")</button>
                     </div>
