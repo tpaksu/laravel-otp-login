@@ -26,10 +26,10 @@ class OtpController extends Controller
                 return view('laravel-otp-login::otpvalidate');
             } else {
                 \Auth::logout();
-                return redirect('/')->withErrors(["username" => "Your OTP Session seems to be expired. Please login again."]);
+                return redirect('/')->withErrors(["username" => __("laravel-otp-login::messages.otp_expired")]);
             }
         } else {
-            return redirect('/')->withErrors(["username" => "You are not allowed to do this."]);;
+            return redirect('/')->withErrors(["username" => __("laravel-otp-login::messages.unauthorized")]);;
         }
     }
 
@@ -44,7 +44,7 @@ class OtpController extends Controller
         $user = \Auth::user();
         $code = $request->input("code");
         if (!$code) {
-            return redirect(route("otp.view"))->withErrors(["code" => __("The field should exist.")]);
+            return redirect(route("otp.view"))->withErrors(["code" => __("laravel-otp-login::messages.code_missing")]);
         } else {
             $otp = OneTimePassword::where(["user_id" => $user->id, "status" => "waiting"])->orderByDesc("created_at")->first();
             if ($otp instanceof OneTimePassword) {
@@ -52,10 +52,10 @@ class OtpController extends Controller
                     $otp->acceptEntrance();
                     return redirect("/");
                 } else {
-                    return redirect(route("otp.view"))->withErrors(["code" => __("The code doesn't match to the generated one. Please check and re-enter the code you received.")]);
+                    return redirect(route("otp.view"))->withErrors(["code" => __("laravel-otp-login::messages.code_mismatch")]);
                 }
             } else {
-                return redirect(route("login"))->withErrors(["phone" => __("Your OTP session has been expired. Please login again to get a new OTP code.")]);
+                return redirect(route("login"))->withErrors(["phone" => __("laravel-otp-login::messages.otp_expired")]);
             }
         }
     }

@@ -77,9 +77,8 @@ class OneTimePassword extends Model
 
     public function discardOldPasswords()
     {
-        \Debugbar::info("discarded");
         $this->update(["status" => "discarded"]);
-        return $this->oneTimePasswordLogs()->where("user_id", $this->user->id)->whereIn("status", ["waiting", "verified"])->update(["status" => "discarded"]);
+        return $this->oneTimePasswordLogs()->whereIn("status", ["waiting", "verified"])->update(["status" => "discarded"]);
     }
 
     public function checkPassword($oneTimePassword)

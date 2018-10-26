@@ -1,5 +1,6 @@
 {
     "name": "tpaksu/laravel-otp-login",
+    "description": "Adds OTP login step to Laravel's built-in authentication system",
     "authors": [
         {
             "name": "Taha PAKSU",
