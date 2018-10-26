@@ -16,8 +16,10 @@ class LoginMiddleware
      */
     public function handle($request, Closure $next)
     {
+        if(\Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false)) return $next($request);
+
         $routeName = $request->route()->getName();
-        if (\Auth::check() && !in_array($routeName, ['otp.view', 'otp.verify', 'logout'])) {
+        if (\Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout'])) {
             $user = \Auth::user();
             $otp = OneTimePassword::whereUserId($user->id)->where("status", "<>", "discarded");
             $needsRefresh = false;

@@ -4,7 +4,6 @@ return [
     'otp_default_service' => env("OTP_SERVICE", "biotekno"),
     'services' => [
         'biotekno' => [
-            "type" => "url",
             "username" => env('OTP_USERNAME', 'null'),
             "password" => env('OTP_PASSWORD', 'null'),
             "transmission_id" => env('OTP_TRANSMISSION_ID', 'null')

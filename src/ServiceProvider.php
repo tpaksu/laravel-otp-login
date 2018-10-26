@@ -28,7 +28,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         \Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
             OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function ($otp) {
                 $otp->discardOldPasswords();
+                \Session::forget("otp_service_bypass");
             });
         });
+
+
     }
 }
