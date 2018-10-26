@@ -79,12 +79,12 @@ class OneTimePassword extends Model
     {
         $this->update(["status" => "discarded"]);
         return $this->oneTimePasswordLogs()->whereIn("status", ["waiting", "verified"])->update(["status" => "discarded"]);
+
     }
 
     public function checkPassword($oneTimePassword)
     {
         $oneTimePasswordLog = $this->oneTimePasswordLogs()
-            ->where("user_id", $this->user->id)
             ->where("status", "waiting")->first();
 
         if (!empty($oneTimePasswordLog)) {
@@ -102,6 +102,8 @@ class OneTimePassword extends Model
     public function acceptEntrance()
     {
         $this->update(["status" => "verified"]);
+        $this->oneTimePasswordLogs()->where("status", "discarded")->delete();
+        OneTimePassword::where(["status" => "discarded", "user_id" => $this->user->id])->delete();
         return $this->oneTimePasswordLogs()->where("user_id", $this->user->id)->where("status", "waiting")->update(["status" => "verified"]);
     }
 }
