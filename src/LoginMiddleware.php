@@ -5,7 +5,6 @@ namespace tpaksu\LaravelOTPLogin;
 use Closure;
 use \Carbon\Carbon;
 
-
 class LoginMiddleware
 {
     /**
@@ -17,7 +16,10 @@ class LoginMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if(\Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false)) return $next($request);
+        \Debugbar::log($_COOKIE);
+        if (\Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false)) {
+            return $next($request);
+        }
 
         $routeName = $request->route()->getName();
         if (\Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout'])) {
@@ -38,7 +40,8 @@ class LoginMiddleware
                         return redirect(route("otp.view"));
                     }
                 } else if ($otp->status == "verified") {
-                    setcookie("otp_login_verified", $user->id, 2147483647); // will expire in 2038
+                    // will expire in one year
+                    setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60));
                     // verified request. go forth.
                     return $next($request);
                 } else {
@@ -55,21 +58,22 @@ class LoginMiddleware
             if ($needsRefresh) {
                 $otp = OneTimePassword::create([
                     "user_id" => $user->id,
-                    "status" => "waiting"
+                    "status" => "waiting",
                 ]);
-                if($otp->send() == true){
+                if ($otp->send() == true) {
                     return redirect(route('otp.view'));
-                }else{
+                } else {
                     $otp->discardOldPasswords();
                     \Auth::logout();
                     return redirect(route('login'));
                 }
             }
-        }else{
-            if(\Auth::guest() && isset($_COOKIE["otp_login_verified"])){
+        } else {
+            if (\Auth::check() == false && isset($_COOKIE["otp_login_verified"]) !== false) {
                 // expiration
-                $user_id = $_COOKIE["otp_login_verified"];
-                setcookie("otp_login_verified", -1, time() - 1);
+                $user_id = intval(str_replace("user_id_", "", \Cookie::get("otp_login_verified")));
+                setcookie("otp_login_verified", "", time() - 3600);
+                unset($_COOKIE['otp_login_verified']);
                 OneTimePassword::whereUserId($user_id)->delete();
             }
         }

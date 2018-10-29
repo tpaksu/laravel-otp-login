@@ -26,6 +26,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);
 
         \Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
+            setcookie("otp_login_verified", "", time() - 3600);
+            unset($_COOKIE['otp_login_verified']);
             OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function ($otp) {
                 $otp->discardOldPasswords();
                 \Session::forget("otp_service_bypass");
