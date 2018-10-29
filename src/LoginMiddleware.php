@@ -5,6 +5,7 @@ namespace tpaksu\LaravelOTPLogin;
 use Closure;
 use \Carbon\Carbon;
 
+
 class LoginMiddleware
 {
     /**
@@ -37,6 +38,7 @@ class LoginMiddleware
                         return redirect(route("otp.view"));
                     }
                 } else if ($otp->status == "verified") {
+                    setcookie("otp_login_verified", $user->id, 2147483647); // will expire in 2038
                     // verified request. go forth.
                     return $next($request);
                 } else {
@@ -62,6 +64,13 @@ class LoginMiddleware
                     \Auth::logout();
                     return redirect(route('login'));
                 }
+            }
+        }else{
+            if(\Auth::guest() && isset($_COOKIE["otp_login_verified"])){
+                // expiration
+                $user_id = $_COOKIE["otp_login_verified"];
+                setcookie("otp_login_verified", -1, time() - 1);
+                OneTimePassword::whereUserId($user_id)->delete();
             }
         }
         return $next($request);
