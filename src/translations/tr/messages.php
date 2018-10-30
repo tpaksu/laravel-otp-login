@@ -8,5 +8,6 @@
     "unauthorized" => "Bu işlemi gerçekleştirebilmek için yetkiniz yok.",
     "code_missing" => "Şifre alanı boş gönderilemez.",
     "code_mismatch" => "Şifreniz sistemimize kayıtlı şifre ile uyuşmuyor. Lütfen kontrol edip size gönderilen kodu tekrar giriniz.",
-    "otp_message" => "Sisteme giriş yapabilmeniz için tek kullanımlık şifreniz: :password"
+    "otp_message" => "Sisteme giriş yapabilmeniz için tek kullanımlık şifreniz: :password",
+    "otp_not_received" => "Şifreniz gelmedi mi? Çıkış yapıp tekrar deneyin!"
 ];

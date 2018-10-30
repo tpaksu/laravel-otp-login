@@ -16,51 +16,43 @@ class LoginMiddleware
      */
     public function handle($request, Closure $next)
     {
-        \Debugbar::log($_COOKIE);
-        if (\Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false)) {
-            return $next($request);
-        }
+        if ($this->bypassing()) return $next($request);
 
         $routeName = $request->route()->getName();
-        if (\Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout'])) {
+        if ($this->willCheck($routeName)) {
             $user = \Auth::user();
-            $otp = OneTimePassword::whereUserId($user->id)->where("status", "<>", "discarded");
+            $otp = $this->getUserOTP($user);
             $needsRefresh = false;
-            if ($otp->count() > 0) {
-                $otp = $otp->orderByDesc("created_at")->first();
+            if ($otp instanceof OneTimePassword) {
                 if ($otp->status == "waiting") {
                     // check timeout
-                    if ($otp->status < Carbon::now()->subSeconds(config("otp.otp_timeout"))) {
-                        // expired.
-                        $otp->discardOldPasswords();
-                        // needs to login again.
-                        \Auth::logout();
+                    if ($otp->isExpired()) {
+                        // expired. redirect to login page
+                        $this->createCookie();
+                        return $this->logout($otp);
                     } else {
                         // still valid. redirect to login verify screen
                         return redirect(route("otp.view"));
                     }
                 } else if ($otp->status == "verified") {
-                    if (isset($_COOKIE["otp_login_verified"]) == false) {
-                        // needs a new verification
-                        $needsRefresh = true;
+                    // verified request. go forth.
+                    $response = $next($request);
+                    if ($response->status() == 419) {
+                        // timeout occured
+                        $this->createExpiredCookie();
+                        return $this->logout($otp);
                     } else {
                         // will expire in one year
-                        setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60));
-                        // verified request. go forth.
-                        return $next($request);
+                        $this->createCookie($user->id);
+                        return $response;
                     }
                 } else {
-                    // invalid status
-                    // needs to login again.
-                    \Auth::logout();
-                    return redirect("/");
+                    // invalid status, needs to login again.
+                    $this->createExpiredCookie();
+                    return $this->logout($otp);
                 }
             } else {
-                // needs a new verification
-                $needsRefresh = true;
-            }
-
-            if ($needsRefresh) {
+                // creating a new OTP login session
                 $otp = OneTimePassword::create([
                     "user_id" => $user->id,
                     "status" => "waiting",
@@ -68,20 +60,63 @@ class LoginMiddleware
                 if ($otp->send() == true) {
                     return redirect(route('otp.view'));
                 } else {
-                    $otp->discardOldPasswords();
-                    \Auth::logout();
-                    return redirect(route('login'));
+                    $this->createExpiredCookie();
+                    return $this->logout($otp)->withError("message", "SMS service currently not responding.");
                 }
             }
         } else {
-            if (\Auth::check() == false && isset($_COOKIE["otp_login_verified"]) !== false) {
+            if (\Auth::guest() && $this->hasCookie()) {
                 // expiration
-                $user_id = intval(str_replace("user_id_", "", \Cookie::get("otp_login_verified")));
-                setcookie("otp_login_verified", "", time() - 3600);
-                unset($_COOKIE['otp_login_verified']);
+                $user_id = $this->getUserIdFromCookie();
                 OneTimePassword::whereUserId($user_id)->delete();
+                $this->createExpiredCookie();
+                return $next($request);
             }
         }
         return $next($request);
+    }
+
+    private function bypassing()
+    {
+        return \Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false);
+    }
+
+    private function willCheck($routeName)
+    {
+        return \Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout']);
+    }
+
+    private function getUserOTP($user)
+    {
+        return OneTimePassword::whereUserId($user->id)->where("status", "!=", "discarded")->first();
+    }
+
+    private function logout($otp)
+    {
+        $otp->discardOldPasswords();
+        \Auth::logout();
+        return redirect(route('login'));
+    }
+
+    private function hasCookie()
+    {
+        return isset($_COOKIE["otp_login_verified"]) && starts_with($_COOKIE["otp_login_verified"], 'user_id_');
+    }
+
+    private function createCookie($user_id)
+    {
+        setcookie("otp_login_verified", "user_id_" . $user_id, time() + (365 * 24 * 60 * 60));
+    }
+
+    private function createExpiredCookie()
+    {
+        if($this->hasCookie()){
+            setcookie("otp_login_verified", "", time() - 100);
+        }
+    }
+
+    private function getUserIdFromCookie()
+    {
+        return intval(str_replace("user_id_", "", $_COOKIE["otp_login_verified"]));
     }
 }

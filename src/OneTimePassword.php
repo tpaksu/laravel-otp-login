@@ -106,4 +106,8 @@ class OneTimePassword extends Model
         OneTimePassword::where(["status" => "discarded", "user_id" => $this->user->id])->delete();
         return $this->oneTimePasswordLogs()->where("user_id", $this->user->id)->where("status", "waiting")->update(["status" => "verified"]);
     }
+
+    public function isExpired(){
+        return $otp->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
+    }
 }

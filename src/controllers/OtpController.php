@@ -49,6 +49,8 @@ class OtpController extends Controller
             $otp = OneTimePassword::where(["user_id" => $user->id, "status" => "waiting"])->orderByDesc("created_at")->first();
             if ($otp instanceof OneTimePassword) {
                 if ($otp->checkPassword($code)) {
+                    // will expire in one year
+                    setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60), "/", "", false, true);
                     $otp->acceptEntrance();
                     return redirect("/");
                 } else {
