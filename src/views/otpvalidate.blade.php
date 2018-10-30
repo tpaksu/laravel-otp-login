@@ -15,7 +15,7 @@
                     <div class="form-group">
                         <label class="form-label">{{__("laravel-otp-login::messages.one_time_password")}}</label>
                         <input id="code" type="text" class="form-control{{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" value="{{ old('code') }}"
-                            required autofocus> @if ($errors->has('code'))
+                            required autofocus autocomplete="off"> @if ($errors->has('code'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('code') }}</strong>
                         </span>

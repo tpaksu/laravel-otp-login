@@ -40,10 +40,15 @@ class LoginMiddleware
                         return redirect(route("otp.view"));
                     }
                 } else if ($otp->status == "verified") {
-                    // will expire in one year
-                    setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60));
-                    // verified request. go forth.
-                    return $next($request);
+                    if (isset($_COOKIE["otp_login_verified"]) == false) {
+                        // needs a new verification
+                        $needsRefresh = true;
+                    } else {
+                        // will expire in one year
+                        setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60));
+                        // verified request. go forth.
+                        return $next($request);
+                    }
                 } else {
                     // invalid status
                     // needs to login again.
