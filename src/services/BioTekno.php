@@ -29,7 +29,6 @@ class BioTekno implements ServiceInterface
                 '&TransmissionID=' . $this->transmissionID .
                 '&Messages=' . urlencode(iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)));
             $results = file_get_contents($url);
-            \Debugbar::info([$url, $results]);
             return strpos($results, "Status=0") !== false;
         } catch (\Exception $e) {
             return false;
