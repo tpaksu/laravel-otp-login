@@ -16,7 +16,9 @@ class LoginMiddleware
      */
     public function handle($request, Closure $next)
     {
-        if ($this->bypassing()) return $next($request);
+        if ($this->bypassing() || in_array("auth", $request->route()->computedMiddleware) == false) {
+            return $next($request);
+        }
 
         $routeName = $request->route()->getName();
         if ($this->willCheck($routeName)) {
@@ -70,7 +72,6 @@ class LoginMiddleware
                 $user_id = $this->getUserIdFromCookie();
                 OneTimePassword::whereUserId($user_id)->delete();
                 $this->createExpiredCookie();
-                return $next($request);
             }
         }
         return $next($request);
@@ -110,7 +111,7 @@ class LoginMiddleware
 
     private function createExpiredCookie()
     {
-        if($this->hasCookie()){
+        if ($this->hasCookie()) {
             setcookie("otp_login_verified", "", time() - 100);
         }
     }
