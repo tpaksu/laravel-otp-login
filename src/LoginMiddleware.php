@@ -30,7 +30,7 @@ class LoginMiddleware
                     // check timeout
                     if ($otp->isExpired()) {
                         // expired. redirect to login page
-                        $this->createCookie();
+                        $this->createExpiredCookie();
                         return $this->logout($otp);
                     } else {
                         // still valid. redirect to login verify screen
