@@ -108,6 +108,6 @@ class OneTimePassword extends Model
     }
 
     public function isExpired(){
-        return $otp->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
+        return $this->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
     }
 }
