@@ -1,16 +1,22 @@
 <?php
 return [
     'otp_service_enabled' => true,
-    'otp_default_service' => env("OTP_SERVICE", "biotekno"),
+    'otp_default_service' => env("OTP_SERVICE", "nexmo"),
     'services' => [
         'biotekno' => [
             "class" => \tpaksu\LaravelOTPLogin\Services\BioTekno::class,
-            "username" => env('OTP_USERNAME', 'null'),
-            "password" => env('OTP_PASSWORD', 'null'),
-            "user_phone_field" => 'phone',
-            "transmission_id" => env('OTP_TRANSMISSION_ID', 'null')
+            "username" => env('OTP_USERNAME', null),
+            "password" => env('OTP_PASSWORD', null),
+            "transmission_id" => env('OTP_TRANSMISSION_ID', null)
+        ],
+        'nexmo' => [
+            'class' => \tpaksu\LaravelOTPLogin\Services\Nexmo::class,
+            'api_key' => env("OTP_API_KEY", null),
+            'api_secret' => env('OTP_API_SECRET', null),
+            'from' => env('OTP_FROM', null)
         ]
     ],
+    'user_phone_field' => 'phone',
     'otp_reference_number_length' => 6,
     'otp_timeout' => 300,
     'otp_digit_length' => 6,

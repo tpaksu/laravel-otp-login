@@ -17,7 +17,7 @@ class BioTekno implements ServiceInterface
         $this->username = config('otp.services.biotekno.username', "");
         $this->password = config('otp.services.biotekno.password', "");
         $this->message =  trans('laravel-otp-login::messages.otp_message');
-        $this->phone_column = config('otp.services.biotekno.user_phone_field');
+        $this->phone_column = config('otp.services.user_phone_field');
         $this->transmissionID = config('otp.services.biotekno.transmission_id', "");
     }
     public function sendOneTimePassword(User $user, $otp)
