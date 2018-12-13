@@ -5,6 +5,7 @@ namespace tpaksu\LaravelOTPLogin;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class OneTimePassword extends Model
 {
