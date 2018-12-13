@@ -66,13 +66,13 @@ class OneTimePassword extends Model
 
     private function ReferenceNumber()
     {
-        $number = strval(rand(10000000, 99999999));
+        $number = strval(rand(100000000, 999999999));
         return substr($number, 0, config("otp.otp_reference_number_length", 4));
     }
 
     private function OTPGenerator()
     {
-        $number = strval(rand(10000000, 99999999));
+        $number = strval(rand(100000000, 999999999));
         return substr($number, 0, config("otp.otp_digit_length", 4));
     }
 

@@ -10,12 +10,14 @@ class BioTekno implements ServiceInterface
     private $username;
     private $password;
     private $message;
+    private $phone_column;
 
     public function __construct()
     {
         $this->username = config('otp.services.biotekno.username', "");
         $this->password = config('otp.services.biotekno.password', "");
         $this->message =  trans('laravel-otp-login::messages.otp_message');
+        $this->phone_column = config('otp.services.biotekno.user_phone_field');
         $this->transmissionID = config('otp.services.biotekno.transmission_id', "");
     }
     public function sendOneTimePassword(User $user, $otp)
@@ -25,7 +27,7 @@ class BioTekno implements ServiceInterface
             $url = 'http://www.biotekno.biz:8080/SMS-Web/HttpSmsSend?' .
                 'Username=' . $this->username .
                 '&Password=' . $this->password .
-                '&Msisdns=' . $user->phone .
+                '&Msisdns=' . $user->{$this->phone_column} .
                 '&TransmissionID=' . $this->transmissionID .
                 '&Messages=' . urlencode(iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)));
             $results = file_get_contents($url);
