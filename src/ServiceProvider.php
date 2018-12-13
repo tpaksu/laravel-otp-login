@@ -13,8 +13,6 @@ class LaravelOTPServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     public function boot()
     {
-        if (config("otp.otp_service_enabled", false) == false) return;
-
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/views', 'laravel-otp-login');
@@ -29,6 +27,9 @@ class LaravelOTPServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);
 
         \Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
+
+            if (config("otp.otp_service_enabled", false) == false) return;
+
             setcookie("otp_login_verified", "", time() - 3600);
             unset($_COOKIE['otp_login_verified']);
             OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function ($otp) {

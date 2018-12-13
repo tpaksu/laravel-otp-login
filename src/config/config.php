@@ -13,4 +13,7 @@ return [
     'otp_timeout' => 300,
     'otp_digit_length' => 6,
     'encode_password' => false,
+    'services' => [
+        'biotekno' => \tpaksu\LaravelOTPLogin\Services\BioTekno::class,
+    ]
 ];
