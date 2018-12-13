@@ -15,7 +15,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "tpaksu\\LaravelOTPLogin\\ServiceProvider"
+                "tpaksu\\LaravelOTPLogin\\LaravelOTPServiceProvider"
             ],
             "aliases": {
                 "OTPLogin": "tpaksu\\LaravelOTPLogin\\Facade"

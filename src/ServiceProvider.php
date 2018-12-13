@@ -4,7 +4,7 @@ namespace tpaksu\LaravelOTPLogin;
 
 use tpaksu\LaravelOTPLogin\LoginMiddleware;
 
-class ServiceProvider extends \Illuminate\Support\ServiceProvider
+class LaravelOTPServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -23,6 +23,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $this->publishes([__DIR__ . '/config/config.php' => config_path('otp.php')], "config");
         $this->publishes([__DIR__ . '/views' => resource_path('views/vendor/laravel-otp-login')], "views");
         $this->publishes([__DIR__ . '/migrations' => database_path('migrations')], "migrations");
+        $this->publishes([__DIR__ . '/services' => app_path('OtpServices')], "migrations");
         $this->publishes([__DIR__ . '/translations' => resource_path('lang/vendor/laravel-otp-login')]);
 
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);

@@ -7,8 +7,9 @@ class ServiceFactory
 {
     public function getService($serviceName)
     {
-        if ($serviceName == "biotekno") {
-            return new Services\BioTekno();
+        $services = config("otp.services", []);
+        if (isset($services[$serviceName]) && class_exists($services[$serviceName])) {
+            return new $services[$serviceName]();
         } else {
             return null;
         }
