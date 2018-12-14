@@ -61,9 +61,10 @@ class BioTekno implements ServiceInterface
      *
      * @param App\User $user
      * @param string $otp
+     * @param string $ref
      * @return boolean
      */
-    public function sendOneTimePassword(User $user, $otp)
+    public function sendOneTimePassword(User $user, $otp, $ref)
     {
         // phone numbers need to be starting without a leading zero in this service
         // extract the phone number from the user

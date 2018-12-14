@@ -4,7 +4,7 @@ namespace tpaksu\LaravelOTPLogin;
 
 use tpaksu\LaravelOTPLogin\LoginMiddleware;
 
-class LaravelOTPServiceProvider extends \Illuminate\Support\ServiceProvider
+class OTPServiceProvider extends \Illuminate\Support\ServiceProvider
 {
     /**
      * Bootstrap the application services.

@@ -64,9 +64,10 @@ class Twilio implements ServiceInterface
      *
      * @param App\User $user
      * @param string $otp
+     * @param string $ref
      * @return boolean
      */
-    public function sendOneTimePassword(User $user, $otp)
+    public function sendOneTimePassword(User $user, $otp, $ref)
     {
         // extract the phone from the user
         $user_phone = data_get($user, $this->phone_column, false);

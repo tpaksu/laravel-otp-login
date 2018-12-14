@@ -23,11 +23,13 @@ class OneTimePassword extends Model
 
     public function send()
     {
-        $otp = $this->createOTP();
+        $ref = $this->ReferenceNumber();
+
+        $otp = $this->createOTP($ref);
 
         if (!empty($otp)) {
             if (config("otp.otp_service_enabled", false)) {
-                return $this->sendOTPWithService($this->user, $otp);
+                return $this->sendOTPWithService($this->user, $otp, $ref);
             }
             return true;
         }
@@ -35,24 +37,26 @@ class OneTimePassword extends Model
         return null;
     }
 
-    private function sendOTPWithService($user, $otp)
+    private function sendOTPWithService($user, $otp, $ref)
     {
         $OTPFactory = new ServiceFactory();
 
         $service = $OTPFactory->getService(config("otp.otp_default_service", null));
 
         if ($service) {
-            return $service->sendOneTimePassword($user, $otp);
+            return $service->sendOneTimePassword($user, $otp, $ref);
         }
 
         return false;
     }
 
-    public function createOTP()
+    public function createOTP($ref)
     {
         $this->discardOldPasswords();
         $otp = $this->OTPGenerator();
+
         $otp_code = $otp;
+
         if (config("otp.encode_password", false)) {
             $otp_code = Hash::make($otp);
         }
@@ -62,7 +66,7 @@ class OneTimePassword extends Model
         $this->oneTimePasswordLogs()->create([
             'user_id' => $this->user->id,
             'otp_code' => $otp_code,
-            'refer_number' => $this->ReferenceNumber(),
+            'refer_number' => $ref,
             'status' => 'waiting',
         ]);
 
