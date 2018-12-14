@@ -1,21 +1,21 @@
-#Laravel OTP Login Package
+# Laravel OTP Login Package
 [![Total Downloads](https://poser.pugx.org/tpaksu/laravel-otp-login/downloads.png)](https://packagist.org/packages/tpaksu/laravel-otp-login) [![Latest Stable Version](https://poser.pugx.org/tpaksu/laravel-otp-login/v/stable.png)](https://packagist.org/packages/tpaksu/laravel-otp-login)
 
 This package provides an One Time Password check step after successful login using the default authentication mechanism. The package stores all requested OTP and it's validation statuses in `one_time_passwords` and `one_time_password_logs` tables.
 
 It uses the middleware included in this package to check if the user has passed the OTP check or not regarding the current authentication status.
 
-##Credits
+## Credits
 
 This package is based on the idea of [nattaponra/laravel-one-time-password](https://github.com/nattaponra/laravel-one-time-password) package. The middleware, translations, views, the controller, routes and extending the services strategy is developed by me.
 
-##Requirements
+## Requirements
 
 * [Composer](https://getcomposer.org/)
 * [Laravel](http://laravel.com/)
 
 
-##Installation
+## Installation
 
 You can install this package on an existing Laravel project with using composer:
 
@@ -49,7 +49,7 @@ Apply the migrations for the `OneTimePassword` and `OneTimePasswordLogs` tables:
  $ php artisan migrate
 ```
 
-##Configuration
+## Configuration
 
 This package publishes an `otp.php` file inside your applications's `config` folder which contains the settings for this package. Most of the variables are bound to environment variables, but you are free to directly edit this file, or add the configuration keys to the `.env` file.
 
@@ -120,11 +120,11 @@ This line shows the length of the generated one time password. It should be belo
 'otp_digit_length' => 6,
 ```
 
-##Views
+## Views
 
 This package publishes one view named `otpvalidate.blade.php` to `resources/views/vendor/laravel-otp-login` folder, which contains the OTP validation screen. The strings used in this view are fetched from the language files also published in this package, so if you are trying to change the strings inside this view, you can change it inside the language file.
 
-##Translations
+## Translations
 
 This package publishes the translations to `resources/lang/vendor/laravel-otp-login` folder, Turkish and English languages are published by this package as `php` files, and you can translate it into more languages by using the English language file as a template. Here's the content of the English file as an example:
 
