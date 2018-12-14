@@ -9,5 +9,6 @@
     "code_missing" => "The OTP field should exist and be filled.",
     "code_mismatch" => "The code doesn't match to the generated one. Please check and re-enter the code you received.",
     "otp_message" => "Your one-time password to enter the system is: :password",
-    "otp_not_received" => "Didn't receive the password? Log out and try again!"
+    "otp_not_received" => "Didn't receive the password? Log out and try again!",
+    "service_not_responding" => "SMS service currently seems to be not responding. Please try again."
 ];

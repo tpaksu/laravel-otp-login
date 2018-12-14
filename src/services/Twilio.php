@@ -6,25 +6,25 @@ use App\User;
 use tpaksu\LaravelOTPLogin\ServiceInterface;
 
 /**
- * Nexmo SMS service handler
+ * Twilio SMS service handler
  *
  * @namespace tpaksu\LaravelOTPLogin\Services
  */
-class Nexmo implements ServiceInterface
+class Twilio implements ServiceInterface
 {
     /**
-     * API key given by nexmo
+     * API Account SID given from twilio
      *
      * @var string
      */
-    private $api_key;
+    private $api_account_sid;
 
     /**
-     * API Secret given by nexmo
+     * API Auth token given from twilio
      *
      * @var string
      */
-    private $api_secret;
+    private $api_auth_token;
 
     /**
      * The message to be send to the user
@@ -41,7 +41,7 @@ class Nexmo implements ServiceInterface
     private $phone_column;
 
     /**
-     * FROM number given by nexmo
+     * FROM number given by twilio
      *
      * @var string
      */
@@ -52,9 +52,9 @@ class Nexmo implements ServiceInterface
      */
     public function __construct()
     {
-        $this->from = config('otp.services.nexmo.from', "");
-        $this->api_key = config('otp.services.nexmo.api_key', "");
-        $this->api_secret = config('otp.services.nexmo.api_secret', "");
+        $this->from = config('otp.services.twilio.from', "");
+        $this->api_account_sid = config('otp.services.twilio.account_sid', "");
+        $this->api_auth_token = config('otp.services.twilio.auth_token', "");
         $this->message = trans('laravel-otp-login::messages.otp_message');
         $this->phone_column = config('otp.user_phone_field');
     }
@@ -75,26 +75,34 @@ class Nexmo implements ServiceInterface
         if (!$user_phone) return false;
 
         try {
+
             // prepare the request url
-            $url = 'https://rest.nexmo.com/sms/json?' . http_build_query([
-                'api_key' => $this->api_key,
-                'api_secret' => $this->api_secret,
-                'to' => $user_phone,
-                'from' => $this->from,
-                'text' => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message))
-            ]);
+            $url = "https://api.twilio.com/2010-04-01/Accounts/" . $this->api_account_sid . "/Messages.json";
 
             // prepare the CURL channel
             $ch = curl_init($url);
 
-            // should return the transfer
+            // set the request type to POST
+            curl_setopt($ch, CURLOPT_POST, 1);
+
+            // prepare the body data
+            curl_setopt($ch, CURLOPT_POSTFIELDS, [
+                "Body" => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)),
+                "From" => $this->from,
+                "To" => $user_phone
+            ]);
+
+            // add the authentication info
+            curl_setopt($ch, CURLOPT_USERPWD, $this->api_account_sid . ":" . $this->api_auth_token);
+
+            // should return the response
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-            // execute the request
+            // execute the request and get the response
             $response = curl_exec($ch);
 
-            // check if response contains the succeeded flag
-            return strpos($response, "\"status\": \"0\",") !== false;
+            // check if the response contains the success flag
+            return strpos($response, "\"status\": \"queued\",") !== false;
 
         } catch (\Exception $e) {
 

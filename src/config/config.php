@@ -14,6 +14,12 @@ return [
             'api_key' => env("OTP_API_KEY", null),
             'api_secret' => env('OTP_API_SECRET', null),
             'from' => env('OTP_FROM', null)
+        ],
+        'twilio' => [
+            'class' => \tpaksu\LaravelOTPLogin\Services\Twilio::class,
+            'account_sid' => env("OTP_ACCOUNT_SID", null),
+            'auth_token' => env("OTP_AUTH_TOKEN", null),
+            'from' => env("OTP_FROM", null)
         ]
     ],
     'user_phone_field' => 'phone',

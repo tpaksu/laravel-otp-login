@@ -24,22 +24,27 @@ class OneTimePassword extends Model
     public function send()
     {
         $otp = $this->createOTP();
+
         if (!empty($otp)) {
             if (config("otp.otp_service_enabled", false)) {
                 return $this->sendOTPWithService($this->user, $otp);
             }
             return true;
         }
+
         return null;
     }
 
     private function sendOTPWithService($user, $otp)
     {
         $OTPFactory = new ServiceFactory();
+
         $service = $OTPFactory->getService(config("otp.otp_default_service", null));
+
         if ($service) {
             return $service->sendOneTimePassword($user, $otp);
         }
+
         return false;
     }
 
@@ -108,7 +113,8 @@ class OneTimePassword extends Model
         return $this->oneTimePasswordLogs()->where("user_id", $this->user->id)->where("status", "waiting")->update(["status" => "verified"]);
     }
 
-    public function isExpired(){
+    public function isExpired()
+    {
         return $this->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
     }
 }
