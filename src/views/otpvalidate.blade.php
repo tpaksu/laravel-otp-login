@@ -3,10 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col col-login mx-auto">
-            <div class="text-center mb-6">
-                <img src="{{asset('assets/images/provas_male.png')}}" class="h-9" alt="">
-            </div>
+        <div class="col col-login mx-auto">           
             <form method="POST" action="{{ route('otp.verify') }}" class="card" aria-label="{{ __('laravel-otp-login::messages.verify_phone_button') }}">
                 @csrf
                 <div class="card-body p-6">
