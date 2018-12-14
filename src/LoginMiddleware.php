@@ -133,7 +133,7 @@ class LoginMiddleware
                     $this->createExpiredCookie();
 
                     // send the user to login screen with error
-                    return $this->logout($otp)->withError("message", __("laravel-otp-login::messages.service_not_responding"));
+                    return $this->logout($otp)->with("message", __("laravel-otp-login::messages.service_not_responding"));
                 }
             }
         } else {
@@ -202,7 +202,8 @@ class LoginMiddleware
     private function logout($otp)
     {
         $otp->discardOldPasswords();
-        return \Auth::logout();
+        \Auth::logout();
+        return redirect('/');
     }
 
     /**
