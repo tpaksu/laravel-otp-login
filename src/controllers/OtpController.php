@@ -7,18 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use tpaksu\LaravelOTPLogin\OneTimePassword;
 use tpaksu\LaravelOTPLogin\OneTimePasswordLog;
-use Illuminate\Foundation\Auth\RedirectsUsers;
 
 /**
  * Class for handling OTP view display and processing
  */
 class OtpController extends Controller
 {
-    /**
-     * Used to get the redirect URL after successful redirection
-     */
-    use RedirectsUsers;
-
     /**
      * Shows the OTP login screen
      *
@@ -93,8 +87,24 @@ class OtpController extends Controller
                         $otp->acceptEntrance();
 
                         // redirect user to the login redirect path defined in the application
-                        return redirect($this->redirectPath());
 
+                        // get the application namespace
+                        $namespace = \Illuminate\Container\Container::getInstance()->getNamespace();
+
+                        // check if the stock login controller exists
+                        $class = "\\" . $namespace . "Http\\Controllers\\Auth\\LoginController";
+                        if (class_exists($class)) {
+
+                            // create a new instance of this class to get the redirect path
+                            $authenticator = new $class();
+
+                            // redirect to the redirect after login page
+                            return redirect($authenticator->redirectPath());
+                        } else {
+
+                            //redirect to the root page
+                            return redirect("/");
+                        }
                     } else {
 
                         // the codes don't match, return an error.

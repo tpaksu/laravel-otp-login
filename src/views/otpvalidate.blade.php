@@ -2,28 +2,35 @@
 
 @section('content')
 <div class="container">
-    <div class="row">
-        <div class="col col-login mx-auto">           
-            <form method="POST" action="{{ route('otp.verify') }}" class="card" aria-label="{{ __('laravel-otp-login::messages.verify_phone_button') }}">
-                @csrf
-                <div class="card-body p-6">
-                    <div class="card-title">{{__("laravel-otp-login::messages.verify_phone_title")}}</div>
-					<p>{{__("laravel-otp-login::messages.hero_text", ["digit" => config("otp.otp_digit_length", 6)])}}</p>
-                    <div class="form-group">
-                        <label class="form-label">{{__("laravel-otp-login::messages.one_time_password")}}</label>
-                        <input id="code" type="text" class="form-control{{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" value="{{ old('code') }}"
-                            required autofocus autocomplete="off"> @if ($errors->has('code'))
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $errors->first('code') }}</strong>
-                        </span>
-                        @endif
-                    </div>
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-primary btn-block">{{__("laravel-otp-login::messages.verify_phone_button")}}</button>
-                    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{__("laravel-otp-login::messages.verify_phone_title")}}</div>
+                <div class="card-body">
+                    <form method="POST" action="{{ route('otp.verify') }}">
+                        @csrf
+
+                        <p>{{__("laravel-otp-login::messages.hero_text", ["digit" => config("otp.otp_digit_length", 6)])}}</p>
+
+                        <div class="form-group">
+                            <label class="form-label">{{__("laravel-otp-login::messages.one_time_password")}}</label>
+
+                            <input id="code" type="text" class="form-control{{ $errors->has('code') ? ' is-invalid' : '' }}" name="code" value="{{ old('code') }}"
+                            required autofocus autocomplete="off">
+                            @if ($errors->has('code'))
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $errors->first('code') }}</strong>
+                            </span>
+                            @endif
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="submit" class="btn btn-primary">{{__("laravel-otp-login::messages.verify_phone_button")}}</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-            <div class="text-center">
+            </div>
+            <div class="text-center mt-4">
                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     {{ __('laravel-otp-login::messages.otp_not_received') }}
                 </a>
