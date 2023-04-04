@@ -23,8 +23,10 @@ return [
         ]
     ],
     'user_phone_field' => 'phone',
+    'user_id_field' => '_id',
     'otp_reference_number_length' => 6,
     'otp_timeout' => 7890000,
     'otp_digit_length' => 6,
-    'encode_password' => false
+    'encode_password' => false,
+    'otp_discard_time'=>7890000
 ];

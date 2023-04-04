@@ -18,7 +18,7 @@ class OneTimePassword extends Model
 
     public function user()
     {
-        return $this->hasOne(User::class, "id", "user_id");
+        return $this->hasOne(User::class, config("otp.user_id_field"), "user_id");
     }
 
     public function send()
@@ -64,7 +64,7 @@ class OneTimePassword extends Model
         $this->update(["status" => "waiting"]);
 
         $this->oneTimePasswordLogs()->create([
-            'user_id' => $this->user->id,
+            'user_id' => $this->user->getAttribute(config("otp.user_id_field")),
             'otp_code' => $otp_code,
             'refer_number' => $ref,
             'status' => 'waiting',
@@ -113,12 +113,17 @@ class OneTimePassword extends Model
     {
         $this->update(["status" => "verified"]);
         $this->oneTimePasswordLogs()->where("status", "discarded")->delete();
-        OneTimePassword::where(["status" => "discarded", "user_id" => $this->user->id])->delete();
-        return $this->oneTimePasswordLogs()->where("user_id", $this->user->id)->where("status", "waiting")->update(["status" => "verified"]);
+        OneTimePassword::where(["status" => "discarded", "user_id" => $this->user->getAttribute(config("otp.user_id_field"))])->delete();
+        return $this->oneTimePasswordLogs()->where("user_id", $this->user->getAttribute(config("otp.user_id_field")))->where("status", "waiting")->update(["status" => "verified"]);
     }
 
     public function isExpired()
     {
         return $this->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
     }
+    // check if new OTP needs to send and verify
+    public function isDiscarded()
+    {
+        return $this->updated_at < Carbon::now()->subSeconds(config("otp.otp_discard_time"));
+    } 
 }
