@@ -46,7 +46,7 @@ class LoginMiddleware
 
             // get the logged in user
             $user = \Auth::user();
-            $userId = $user->getAttribute(config("otp.user_id_field"));
+            $userId = $user->getAttribute(config("otp.user_id_field", "id"));
 
             // check for user OTP request in the database
             $otp = $this->getUserOTP($user);
@@ -143,10 +143,10 @@ class LoginMiddleware
                 if ($this->debug) logger("if user hasn't logged in and cookie exists, delete cookie");
 
                 // get the user ID from cookie
-                $user_id = $this->getUserIdFromCookie();
+                $userId = $this->getUserIdFromCookie();
 
                 // delete the OTP requests from database for that specific user
-                OneTimePassword::whereUserId($user_id)->delete();
+                OneTimePassword::whereUserId($userId)->delete();
 
                 // expire that cookie
                 $this->createExpiredCookie();
@@ -189,7 +189,7 @@ class LoginMiddleware
      */
     private function getUserOTP($user)
     {
-        return OneTimePassword::whereUserId($user->getAttribute(config("otp.user_id_field")))->where("status", "!=", "discarded")->first();
+        return OneTimePassword::whereUserId($user->getAttribute(config("otp.user_id_field", "id")))->where("status", "!=", "discarded")->first();
     }
 
     /**

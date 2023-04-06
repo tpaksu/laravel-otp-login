@@ -23,7 +23,9 @@ class CreateOtpLogsTable extends Migration
         });
 
         Schema::table('one_time_password_logs', function (Blueprint $table) {
-            $table->foreign('user_id') ->references('id')->on('users')->onDelete('cascade');
+            $usersTable = config('otp.users_table', 'users');
+            $userIdField = config('otp.user_id_field', 'id');
+            $table->foreign('user_id') ->references($userIdField)->on($usersTable)->onDelete('cascade');
         });
     }
 

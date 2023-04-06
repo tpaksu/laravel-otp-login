@@ -29,10 +29,12 @@ class OTPServiceProvider extends \Illuminate\Support\ServiceProvider
         \Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
 
             if (config("otp.otp_service_enabled", false) == false) return;
-
+            $user = \Auth::user();
+            $userIdField = config("otp.user_id_field", "id");
+            $userId = $user->getAttribute($userIdField);
             setcookie("otp_login_verified", "", time() - 3600);
             unset($_COOKIE['otp_login_verified']);
-            OneTimePassword::where("user_id", \Auth::user()->id)->get()->each(function ($otp) {
+            OneTimePassword::where("user_id", $userId)->get()->each(function ($otp) {
                 $otp->discardOldPasswords();
                 \Session::forget("otp_service_bypass");
             });
