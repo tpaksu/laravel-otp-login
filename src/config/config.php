@@ -22,6 +22,7 @@ return [
             'from' => env("OTP_FROM", null)
         ]
     ],
+    'users_table' => 'users',
     'user_phone_field' => 'phone',
     'user_id_field' => 'id',
     'otp_reference_number_length' => 6,

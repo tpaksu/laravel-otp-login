@@ -23,10 +23,13 @@ class OtpController extends Controller
     {
         // this route is protected by WEB and AUTH middlewares, but still, this check can be useful.
         if (\Auth::check()) {
+            $user = \Auth::user();
+            $usersColumn = config("otp.user_id_field", "id");
+            $userId = $user->getAttribute($usersColumn);
 
             // Check if user has already made a OTP request with a "waiting" status
             $otp = OneTimePassword::where([
-                "user_id" => \Auth::user()->id,
+                "user_id" => $userId,
                 "status" => "waiting"
             ])->orderByDesc("created_at")->first();
 
@@ -61,6 +64,8 @@ class OtpController extends Controller
 
             // get the user for querying the verification code
             $user = \Auth::user();
+            $usersColumn = config("otp.user_id_field", "id");
+            $userId = $user->getAttribute($usersColumn);
 
             // check if current request has a verification code
             if ($request->has("code")) {
@@ -70,7 +75,7 @@ class OtpController extends Controller
 
                 // get the waiting verification code from database
                 $otp = OneTimePassword::where([
-                    "user_id" => $user->id,
+                    "user_id" => $userId,
                     "status" => "waiting"
                 ])->orderByDesc("created_at")->first();
 
@@ -81,7 +86,7 @@ class OtpController extends Controller
                     if ($otp->checkPassword($code)) {
 
                         // the codes match, set a cookie to expire in one year
-                        setcookie("otp_login_verified", "user_id_" . $user->id, time() + (365 * 24 * 60 * 60), "/", "", false, true);
+                        setcookie("otp_login_verified", "user_id_" . $userId, time() + (365 * 24 * 60 * 60), "/", "", false, true);
 
                         // set the code status to "verified" in the database
                         $otp->acceptEntrance();
