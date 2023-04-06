@@ -46,16 +46,15 @@ class LoginMiddleware
 
             // get the logged in user
             $user = \Auth::user();
+            $userId = $user->getAttribute(config("otp.user_id_field"));
 
             // check for user OTP request in the database
             $otp = $this->getUserOTP($user);
 
             // define the flag for refreshing the OTP verification code
             $needsRefresh = false;
-
-            // a record exists for the user in the database
+            // a record exists for the user in the database 
             if ($otp instanceof OneTimePassword) {
-
                 if ($this->debug) logger("otp found");
 
                 // if has a pending OTP verification request
@@ -95,7 +94,7 @@ class LoginMiddleware
                         if ($this->debug) logger("otp is valid, go forth");
 
                         // create a cookie that will expire in one year
-                        $this->createCookie($user->id);
+                        $this->createCookie($userId);
 
                         // continue to next request
                         return $response;
@@ -115,10 +114,10 @@ class LoginMiddleware
 
                 // creating a new OTP login session
                 $otp = OneTimePassword::create([
-                    "user_id" => $user->id,
+                    "user_id" => $userId,
                     "status" => "waiting",
                 ]);
-                if ($this->debug) logger("created otp for {$user->id}");
+                if ($this->debug) logger("created otp for {$userId}");
 
                 // send the OTP to the user
                 if ($otp->send() == true) {
@@ -190,7 +189,7 @@ class LoginMiddleware
      */
     private function getUserOTP($user)
     {
-        return OneTimePassword::whereUserId($user->id)->where("status", "!=", "discarded")->first();
+        return OneTimePassword::whereUserId($user->getAttribute(config("otp.user_id_field")))->where("status", "!=", "discarded")->first();
     }
 
     /**
