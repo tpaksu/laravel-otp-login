@@ -2,7 +2,6 @@
 
 namespace tpaksu\LaravelOTPLogin;
 
-use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -23,13 +22,13 @@ class OneTimePassword extends Model
 
     public function send()
     {
-        $ref = $this->ReferenceNumber();
+        $referenceNumber = $this->generateReferenceNumber();
 
-        $otp = $this->createOTP($ref);
+        $otp = $this->createOTP($referenceNumber);
 
         if (!empty($otp)) {
             if (config("otp.otp_service_enabled", false)) {
-                return $this->sendOTPWithService($this->user, $otp, $ref);
+                return $this->sendOTPWithService($this->user, $otp, $referenceNumber);
             }
             return true;
         }
@@ -50,39 +49,44 @@ class OneTimePassword extends Model
         return false;
     }
 
-    public function createOTP($ref)
+    public function createOTP($referenceNumber)
     {
         $this->discardOldPasswords();
-        $otp = $this->OTPGenerator();
+        $otp = $this->generateOTP();
 
-        $otp_code = $otp;
+        $otpCode = $otp;
 
         if (config("otp.encode_password", false)) {
-            $otp_code = Hash::make($otp);
+            $otpCode = Hash::make($otp);
         }
 
         $this->update(["status" => "waiting"]);
 
         $this->oneTimePasswordLogs()->create([
             'user_id' => $this->user->getAttribute(config("otp.user_id_field", "id")),
-            'otp_code' => $otp_code,
-            'refer_number' => $ref,
+            'otp_code' => $otpCode,
+            'refer_number' => $referenceNumber,
             'status' => 'waiting',
         ]);
 
         return $otp;
     }
 
-    private function ReferenceNumber()
+    private function generateReferenceNumber()
     {
-        $number = strval(rand(100000000, 999999999));
-        return substr($number, 0, config("otp.otp_reference_number_length", 4));
+        $digits = config("otp.otp_reference_number_length", 4);
+        return $this->generateNumberWithDigits($digits);
     }
 
-    private function OTPGenerator()
+    private function generateOTP()
     {
-        $number = strval(rand(100000000, 999999999));
-        return substr($number, 0, config("otp.otp_digit_length", 4));
+        $digits = config("otp.otp_digit_length", 4);
+        return $this->generateNumberWithDigits($digits);
+    }
+
+    private function generateNumberWithDigits( $digits ) {
+        $number = strval(rand(pow(10, $digits - 1), pow(10, $digits) - 1));
+        return substr($number, 0, $digits);
     }
 
     public function discardOldPasswords()

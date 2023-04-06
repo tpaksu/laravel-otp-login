@@ -1,8 +1,6 @@
 <?php
 namespace tpaksu\LaravelOTPLogin;
 
-use tpaksu\LaravelOTPLogin\Services;
-
 class ServiceFactory
 {
     public function getService($serviceName)

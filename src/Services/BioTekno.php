@@ -2,7 +2,7 @@
 
 namespace tpaksu\LaravelOTPLogin\Services;
 
-use App\User;
+use Illuminate\Auth\Authenticatable;
 use tpaksu\LaravelOTPLogin\ServiceInterface;
 
 /**
@@ -59,12 +59,12 @@ class BioTekno implements ServiceInterface
     /**
      * Sends the generated password to the user and returns if it's successful
      *
-     * @param App\User $user
+     * @param Authenticatable $user
      * @param string $otp
      * @param string $ref
      * @return boolean
      */
-    public function sendOneTimePassword(User $user, $otp, $ref)
+    public function sendOneTimePassword(Authenticatable $user, $otp, $ref)
     {
         // phone numbers need to be starting without a leading zero in this service
         // extract the phone number from the user

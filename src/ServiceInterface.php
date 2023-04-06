@@ -1,7 +1,7 @@
 <?php
 namespace tpaksu\LaravelOTPLogin;
 
-use App\User;
+use Illuminate\Auth\Authenticatable;
 
 interface ServiceInterface
 {
@@ -13,5 +13,5 @@ interface ServiceInterface
      * @param string $ref : Reference Number to compare with
      * @return void
      */
-    public function sendOneTimePassword(User $user, $otp, $ref);
+    public function sendOneTimePassword(Authenticatable $user, $otp, $ref);
 }

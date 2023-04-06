@@ -3,8 +3,9 @@
 namespace tpaksu\LaravelOTPLogin;
 
 use Closure;
-use \Carbon\Carbon;
-use Illuminate\Foundation\Auth\RedirectsUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class LoginMiddleware
 {
@@ -44,16 +45,16 @@ class LoginMiddleware
         if ($this->willCheck($routeName)) {
             if ($this->debug) logger("willcheck = true");
 
-            // get the logged in user
-            $user = \Auth::user();
-            $userId = $user->getAttribute(config("otp.user_id_field", "id"));
+            $user = Auth::user();
+            $userIdField = config("otp.user_id_field", "id");
+            $userId = $user->{$userIdField};
 
             // check for user OTP request in the database
             $otp = $this->getUserOTP($user);
 
             // define the flag for refreshing the OTP verification code
             $needsRefresh = false;
-            // a record exists for the user in the database 
+            // a record exists for the user in the database
             if ($otp instanceof OneTimePassword) {
                 if ($this->debug) logger("otp found");
 
@@ -138,7 +139,7 @@ class LoginMiddleware
         } else {
             if ($this->debug) logger("willcheck failed");
             // if an active session doesn't exist, but a cookie is present
-            if (\Auth::guest() && $this->hasCookie()) {
+            if (Auth::guest() && $this->hasCookie()) {
 
                 if ($this->debug) logger("if user hasn't logged in and cookie exists, delete cookie");
 
@@ -167,7 +168,7 @@ class LoginMiddleware
      */
     private function bypassing()
     {
-        return \Session::has("otp_service_bypass") && \Session::get("otp_service_bypass", false);
+        return Session::has("otp_service_bypass") && Session::get("otp_service_bypass", false);
     }
 
     /**
@@ -178,7 +179,7 @@ class LoginMiddleware
      */
     private function willCheck($routeName)
     {
-        return \Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout']);
+        return Auth::check() && config("otp.otp_service_enabled", false) && !in_array($routeName, ['otp.view', 'otp.verify', 'logout']);
     }
 
     /**
@@ -201,7 +202,7 @@ class LoginMiddleware
     private function logout($otp)
     {
         $otp->discardOldPasswords();
-        \Auth::logout();
+        Auth::logout();
         return redirect('/');
     }
 
@@ -212,7 +213,7 @@ class LoginMiddleware
      */
     private function hasCookie()
     {
-        return isset($_COOKIE["otp_login_verified"]) && starts_with($_COOKIE["otp_login_verified"], 'user_id_');
+        return isset($_COOKIE["otp_login_verified"]) && Str::startsWith($_COOKIE["otp_login_verified"], 'user_id_');
     }
 
     /**

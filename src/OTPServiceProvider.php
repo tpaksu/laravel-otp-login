@@ -2,6 +2,9 @@
 
 namespace tpaksu\LaravelOTPLogin;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Session;
 use tpaksu\LaravelOTPLogin\LoginMiddleware;
 
 class OTPServiceProvider extends \Illuminate\Support\ServiceProvider
@@ -26,17 +29,17 @@ class OTPServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $this->app['router']->pushMiddlewareToGroup('web', LoginMiddleware::class);
 
-        \Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
+        Event::listen('Illuminate\Auth\Events\Logout', function ($user) {
 
             if (config("otp.otp_service_enabled", false) == false) return;
-            $user = \Auth::user();
+            $user = Auth::user();
             $userIdField = config("otp.user_id_field", "id");
-            $userId = $user->getAttribute($userIdField);
+            $userId = $user->{$userIdField};
             setcookie("otp_login_verified", "", time() - 3600);
             unset($_COOKIE['otp_login_verified']);
             OneTimePassword::where("user_id", $userId)->get()->each(function ($otp) {
                 $otp->discardOldPasswords();
-                \Session::forget("otp_service_bypass");
+                Session::forget("otp_service_bypass");
             });
         });
 

@@ -2,11 +2,10 @@
 
 namespace tpaksu\LaravelOTPLogin\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use tpaksu\LaravelOTPLogin\OneTimePassword;
-use tpaksu\LaravelOTPLogin\OneTimePasswordLog;
 
 /**
  * Class for handling OTP view display and processing
@@ -22,10 +21,10 @@ class OtpController extends Controller
     public function view(Request $request)
     {
         // this route is protected by WEB and AUTH middlewares, but still, this check can be useful.
-        if (\Auth::check()) {
-            $user = \Auth::user();
+        if (Auth::check()) {
+            $user = Auth::user();
             $usersColumn = config("otp.user_id_field", "id");
-            $userId = $user->getAttribute($usersColumn);
+            $userId = $user->{$usersColumn};
 
             // Check if user has already made a OTP request with a "waiting" status
             $otp = OneTimePassword::where([
@@ -41,7 +40,7 @@ class OtpController extends Controller
             } else {
 
                 // the user hasn't done a request, why is he/she here? redirect back to login screen.
-                \Auth::logout();
+                Auth::logout();
                 return redirect('/')->withErrors(["username" => __("laravel-otp-login::messages.otp_expired")]);
             }
         } else {
@@ -60,12 +59,12 @@ class OtpController extends Controller
     public function check(Request $request)
     {
         // if user has been logged in
-        if (\Auth::check()) {
+        if (Auth::check()) {
 
             // get the user for querying the verification code
-            $user = \Auth::user();
+            $user = Auth::user();
             $usersColumn = config("otp.user_id_field", "id");
-            $userId = $user->getAttribute($usersColumn);
+            $userId = $user->{$usersColumn};
 
             // check if current request has a verification code
             if ($request->has("code")) {
@@ -94,7 +93,7 @@ class OtpController extends Controller
                         // redirect user to the login redirect path defined in the application
 
                         // get the application namespace
-                        $namespace = \Illuminate\Container\Container::getInstance()->getNamespace();
+                        $namespace = app()->getNamespace();
 
                         // check if the stock login controller exists
                         $class = "\\" . $namespace . "Http\\Controllers\\Auth\\LoginController";
