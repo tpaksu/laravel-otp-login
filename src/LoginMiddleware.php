@@ -54,7 +54,7 @@ class LoginMiddleware
             // define the flag for refreshing the OTP verification code
             $needsRefresh = false;
             // a record exists for the user in the database 
-            if ($otp instanceof OneTimePassword && $otp->status) {
+            if ($otp instanceof OneTimePassword) {
                 if ($this->debug) logger("otp found");
 
                 // if has a pending OTP verification request
