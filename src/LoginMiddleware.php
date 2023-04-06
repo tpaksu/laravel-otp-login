@@ -53,15 +53,8 @@ class LoginMiddleware
 
             // define the flag for refreshing the OTP verification code
             $needsRefresh = false;
-            // check if OTP is too old
-            if ($otp instanceof OneTimePassword) {
-                if ($otp->isDiscarded()) {
-                    if ($this->debug) logger("otp found but was old So is discarded, will request for a new");
-                    $otp->update(["status" => "discarded",]);
-                }
-            }
             // a record exists for the user in the database 
-            if ($otp instanceof OneTimePassword && $otp->status != "discarded") {
+            if ($otp instanceof OneTimePassword && $otp->status) {
                 if ($this->debug) logger("otp found");
 
                 // if has a pending OTP verification request

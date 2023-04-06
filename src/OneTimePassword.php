@@ -121,9 +121,4 @@ class OneTimePassword extends Model
     {
         return $this->created_at < Carbon::now()->subSeconds(config("otp.otp_timeout"));
     }
-    // check if new OTP needs to send and verify
-    public function isDiscarded()
-    {
-        return $this->updated_at < Carbon::now()->subSeconds(config("otp.otp_discard_time"));
-    } 
 }
