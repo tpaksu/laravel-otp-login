@@ -3,13 +3,11 @@
 namespace tpaksu\LaravelOTPLogin\Tests;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Config;
-use tpaksu\LaravelOTPLogin\OTPServiceProvider;
 use tpaksu\LaravelOTPLogin\Tests\Helpers\User;
-use Orchestra\Testbench\TestCase as Orchestra;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-abstract class TestCase extends Orchestra
+abstract class TestCase extends OrchestraTestCase
 {
     /**
      * Set up
@@ -52,6 +50,9 @@ abstract class TestCase extends Orchestra
      */
     protected function getPackageProviders($app)
     {
-        return ['tpaksu\LaravelOTPLogin\OTPServiceProvider'];
+        return [
+            \tpaksu\LaravelOTPLogin\OTPServiceProvider::class,
+            \Orchestra\Database\ConsoleServiceProvider::class,
+        ];
     }
 }
