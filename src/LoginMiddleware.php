@@ -15,7 +15,9 @@ class LoginMiddleware
      *
      * @var boolean
      */
-    private $debug = false;    /**
+    private $debug = false;
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -25,17 +27,18 @@ class LoginMiddleware
     public function handle($request, Closure $next)
     {
         $this->debuglog("entered middleware");
-        $this->debuglog($request->route()->computedMiddleware);
+        $this->debuglog($request->route()->middleware());
 
         // check if the request should be bypassed, or the request doesn't have authentication required
-            $routeMiddleware = $request->route()->middleware();
+        $routeMiddleware = $request->route()->middleware();
         if ($this->bypassing()|| ! in_array("auth", $routeMiddleware, true)) {
             $this->debuglog("bypassing");
             return $next($request);
         }
+
         // get the current route
-            $routeName = $request->route()->getName();
-            $this->debuglog("routename $routeName");
+        $routeName = $request->route()->getName();
+        $this->debuglog("routename $routeName");
 
         // check if the requested route should be checked against OTP verification status
         // and also for the user login status
@@ -138,6 +141,7 @@ class LoginMiddleware
         }
 
         $this->debuglog("returning next request");
+
         // continue processing next request.
         return $next($request);
     }
