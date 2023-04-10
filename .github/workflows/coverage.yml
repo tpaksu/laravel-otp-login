@@ -1,0 +1,24 @@
+name: Psalm
+
+on:
+  pull_request:
+    paths:
+      - '**.php'
+      - 'psalm*'
+      - 'composer.json'
+
+jobs:
+  psalm:
+    name: Coverage check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction
+
+      - name: Run coverage check
+        run: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover ./coverage/clover.xml && ./vendor/bin/coverage-check coverage/clover.xml 80
