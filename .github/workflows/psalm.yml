@@ -1,11 +1,6 @@
 name: Psalm
 
 on:
-  push:
-    paths:
-      - '**.php'
-      - 'psalm*'
-      - 'composer.json'
   pull_request:
     paths:
       - '**.php'

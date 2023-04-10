@@ -11,6 +11,27 @@ jobs:
                 os: [ubuntu-latest]
                 laravel: [5.5.*, 5.8.*, 6.*, 8.*, 10.*]
                 php: [7.3, 7.4, 8.0, 8.1]
+                include:
+                    -   laravel: 10.*
+                        testbench: ^8.4
+                        psalm: 4.*
+                        phpunit: ^10.0.7
+                    -   laravel: 8.*
+                        testbench: ^6.27
+                        psalm: 4.*
+                        phpunit: ^8.5.19|^9.5.8
+                    -   laravel: 6.*
+                        testbench: ^4.8
+                        psalm: 4.*
+                        phpunit: ^7.5.15|^8.4|^9.3.3
+                    -   laravel: 5.8.*
+                        testbench: 3.8.*
+                        psalm: 4.*
+                        phpunit: ^7.5|^8.0
+                    -   laravel: 5.5.*
+                        testbench: 3.5.*
+                        psalm: 4.*
+                        phpunit: ~6.0
                 exclude:
                     - laravel: 5.5.*
                       php: 8.0
@@ -50,8 +71,8 @@ jobs:
 
             -   name: Install dependencies
                 run: |
-                    composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench" "phpunit/phpunit" "vimeo/psalm" --no-interaction --no-update
-                    composer install --no-interaction
+                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "phpunit/phpunit:${{ matrix.phpunit }}" "vimeo/psalm:${{ matrix.psalm }}" --no-interaction --no-update
+                    composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
             -   name: Execute tests
                 run: vendor/bin/phpunit
