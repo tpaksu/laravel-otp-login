@@ -48,7 +48,6 @@ class TwilioTest extends TestCase
 
     public function testSendMessageException()
     {
-        $instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
         $this->instance->expects($this->once())
             ->method('sendRequest')
             ->with('https://api.twilio.com/2010-04-01/Accounts/mock_account_sid/Messages.json', 'dummy_phone', '123456')
@@ -60,7 +59,6 @@ class TwilioTest extends TestCase
     public function testSendMessageNoPhone()
     {
         $this->user->phone = '';
-        $instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
         $this->instance->expects($this->never())
             ->method('sendRequest');
         $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");

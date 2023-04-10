@@ -20,6 +20,11 @@
                 <referencedMethod name="tpaksu\LaravelOTPLogin\LoginMiddleware::handle" />
             </errorLevel>
         </PossiblyUnusedMethod>
+        <PossiblyUnusedParam>
+            <errorLevel type="suppress">
+                <file name="../../laravel/framework/src/Illuminate/Foundation/Auth/Access/AuthorizesRequests.php" />
+            </errorLevel>
+        </PossiblyUnusedParam>
         <UnusedClass>
             <errorLevel type="suppress">
                 <referencedClass name="tpaksu\LaravelOTPLogin\OtpServiceProvider" />

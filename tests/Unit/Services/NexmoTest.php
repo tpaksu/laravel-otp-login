@@ -55,7 +55,7 @@ class NexmoTest extends TestCase
             ->method('sendRequest')
             ->with('test_url')
             ->willReturn('"status": "0",');
-        $this->result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertTrue($result);
     }
 
@@ -76,7 +76,7 @@ class NexmoTest extends TestCase
             ->method('sendRequest')
             ->with('test_url')
             ->willReturn('"status": "0",');
-        $this->result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 
@@ -87,7 +87,7 @@ class NexmoTest extends TestCase
             ->method('buildURL');
         $this->instance->expects($this->never())
             ->method('sendRequest');
-        $this->result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 
