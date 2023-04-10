@@ -17,7 +17,7 @@ abstract class TestCase extends OrchestraTestCase
         parent::setUp();
         $this->loadLaravelMigrations(['--database' => 'testbench']);
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+        $this->artisan('migrate', ['--database' => 'testbench']);
     }
 
     /**
