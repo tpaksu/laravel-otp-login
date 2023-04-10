@@ -15,18 +15,23 @@ jobs:
                     -   laravel: 10.*
                         testbench: 8.*
                         psalm: 4.*
+                        phpunit: 9.5.*
                     -   laravel: 8.*
                         testbench: 6.*
                         psalm: 4.*
+                        phpunit: 6.5.*
                     -   laravel: 6.*
                         testbench: 4.*
                         psalm: 4.*
+                        phpunit: 6.5.*
                     -   laravel: 5.8.*
                         testbench: 3.8.*
                         psalm: 4.*
+                        phpunit: 6.5.*
                     -   laravel: 5.5.*
                         testbench: 3.5.*
                         psalm: 4.*
+                        phpunit: 6.5.*
                 exclude:
                     - laravel: 5.5.*
                       php: 8.0
@@ -66,7 +71,7 @@ jobs:
 
             -   name: Install dependencies
                 run: |
-                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}"  "vimeo/psalm:${{ matrix.psalm }}" --no-interaction --no-update
+                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "phpunit/phpunit:${{ matrix.phpunit }}" "vimeo/psalm:${{ matrix.psalm }}" --no-interaction --no-update
                     composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
 
             -   name: Execute tests
