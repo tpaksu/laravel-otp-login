@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Routing\RouteCollection;
 
 class LoginMiddlewareTest extends TestCase
 {
@@ -279,7 +280,9 @@ class LoginMiddlewareTest extends TestCase
         Route::middleware([LoginMiddleware::class])->get('/test-route-no-auth', function () {
             return "logged in no auth";
         })->name('test.route-no-auth');
-        $router->getRoutes()->compile();
+        if (\method_exists(RouteCollection::class, 'compile')) {
+            $router->getRoutes()->compile();
+        }
     }
 
     private function prepareExpiredRoute()
