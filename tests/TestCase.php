@@ -3,17 +3,12 @@
 namespace tpaksu\LaravelOTPLogin\Tests;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Config;
-use tpaksu\LaravelOTPLogin\OTPServiceProvider;
 use tpaksu\LaravelOTPLogin\Tests\Helpers\User;
-use Orchestra\Testbench\TestCase as Orchestra;
-use JMac\Testing\Traits\AdditionalAssertions;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-abstract class TestCase extends Orchestra
+abstract class TestCase extends OrchestraTestCase
 {
-    use AdditionalAssertions;
-
     /**
      * Set up
      */
@@ -22,7 +17,7 @@ abstract class TestCase extends Orchestra
         parent::setUp();
         $this->loadLaravelMigrations(['--database' => 'testbench']);
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        $this->artisan('migrate:refresh', ['--database' => 'testbench'])->run();
+        $this->artisan('migrate', ['--database' => 'testbench']);
     }
 
     /**

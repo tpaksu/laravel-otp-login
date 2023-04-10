@@ -1,0 +1,24 @@
+name: Psalm
+
+on:
+  pull_request:
+    paths:
+      - '**.php'
+      - 'psalm*'
+      - 'composer.json'
+
+jobs:
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction
+
+      - name: Run Psalm
+        run: ./vendor/bin/psalm --no-cache

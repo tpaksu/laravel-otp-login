@@ -24,16 +24,15 @@ class LoginMiddleware
      */
     public function handle($request, Closure $next)
     {
-        try {
-            $this->debuglog("entered middleware");
-            $this->debuglog($request->route()->computedMiddleware);
+        $this->debuglog("entered middleware");
+        $this->debuglog($request->route()->computedMiddleware);
 
         // check if the request should be bypassed, or the request doesn't have authentication required
             $routeMiddleware = $request->route()->middleware();
-            if ($this->bypassing()|| ! in_array("auth", $routeMiddleware, true)) {
-                $this->debuglog("bypassing");
-                return $next($request);
-            }
+        if ($this->bypassing()|| ! in_array("auth", $routeMiddleware, true)) {
+            $this->debuglog("bypassing");
+            return $next($request);
+        }
         // get the current route
             $routeName = $request->route()->getName();
             $this->debuglog("routename $routeName");
@@ -41,109 +40,106 @@ class LoginMiddleware
         // check if the requested route should be checked against OTP verification status
         // and also for the user login status
         // this is needed for skipping the OTP and login routes
-            if ($this->willCheck($routeName)) {
-                $this->debuglog("willcheck = true");
-                $user = Auth::user();
-                $userIdField = config("otp.user_id_field", "id");
-                $userId = $user->{$userIdField};
+        if ($this->willCheck($routeName)) {
+            $this->debuglog("willcheck = true");
+            $user = Auth::user();
+            $userIdField = config("otp.user_id_field", "id");
+            $userId = $user->{$userIdField};
 
-                // check for user OTP request in the database
-                $otp = $this->getUserOTP($user);
+            // check for user OTP request in the database
+            $otp = $this->getUserOTP($user);
 
-                // a record exists for the user in the database
-                if ($otp instanceof OneTimePassword) {
-                    $this->debuglog("otp found");
+            // a record exists for the user in the database
+            if ($otp instanceof OneTimePassword) {
+                $this->debuglog("otp found");
 
-                    // if has a pending OTP verification request
-                    if ($otp->status == "waiting") {
-                        // check timeout
-                        if ($otp->isExpired()) {
-                            $this->debuglog("otp is expired");
+                // if has a pending OTP verification request
+                if ($otp->status == "waiting") {
+                    // check timeout
+                    if ($otp->isExpired()) {
+                        $this->debuglog("otp is expired");
 
-                            // expired. expire the cookie if exists
-                            $this->createExpiredCookie();
-                            //  redirect to login page
-                            return $this->logout($otp);
-                        } else {
-                            $this->debuglog("otp is valid, but status is waiting");
-
-                            // still valid. redirect to login verify screen
-                            return redirect(route("otp.view"));
-                        }
-                    } elseif ($otp->status == "verified") {
-                        $this->debuglog("otp is verified");
-
-                        // verified request. go forth.
-                        $response = $next($request);
-                        if ($response->status() == 419) {
-                            // timeout occured
-                            $this->debuglog("timeout occured");
-                            // expire the cookie if exists
-                            $this->createExpiredCookie();
-                            // redirect to login screen
-                            return $this->logout($otp);
-                        } else {
-                            $this->debuglog("otp is valid, go forth");
-                            // create a cookie that will expire in one year
-                            $this->createCookie($userId);
-                            // continue to next request
-                            return $response;
-                        }
+                        // expired. expire the cookie if exists
+                        $this->createExpiredCookie();
+                        //  redirect to login page
+                        return $this->logout($otp);
                     } else {
-                        // invalid status, needs to login again.
-                        $this->debuglog("invalid status");
+                        $this->debuglog("otp is valid, but status is waiting");
+
+                        // still valid. redirect to login verify screen
+                        return redirect(route("otp.view"));
+                    }
+                } elseif ($otp->status == "verified") {
+                    $this->debuglog("otp is verified");
+
+                    // verified request. go forth.
+                    $response = $next($request);
+                    if ($response->status() == 419) {
+                        // timeout occured
+                        $this->debuglog("timeout occured");
                         // expire the cookie if exists
                         $this->createExpiredCookie();
-                        // redirect to login page
+                        // redirect to login screen
                         return $this->logout($otp);
+                    } else {
+                        $this->debuglog("otp is valid, go forth");
+                        // create a cookie that will expire in one year
+                        $this->createCookie($userId);
+                        // continue to next request
+                        return $response;
                     }
                 } else {
-                    $this->debuglog("otp doesn't exist");
-                    // creating a new OTP login session
-                    $otp = OneTimePassword::create([
-                    "user_id" => $userId,
-                    "status" => "waiting",
-                    ]);
-                    $this->debuglog("created otp for {$userId}");
-                    // send the OTP to the user
-                    if ($otp->send() == true) {
-                        $this->debuglog("otp send succeeded");
-                        // redirect to OTP verification screen
-                        return redirect(route('otp.view'));
-                    } else {
-                        $this->debuglog("otp send failed");
-                        // otp send failed, expire the cookie if exists
-                        $this->createExpiredCookie();
-                        // send the user to login screen with error
-                        return $this
-                        ->logout($otp)
-                        ->with(
-                            "message",
-                            __("laravel-otp-login::messages.service_not_responding")
-                        );
-                    }
+                    // invalid status, needs to login again.
+                    $this->debuglog("invalid status");
+                    // expire the cookie if exists
+                    $this->createExpiredCookie();
+                    // redirect to login page
+                    return $this->logout($otp);
                 }
             } else {
-                $this->debuglog("willcheck failed");
-
-                // if an active session doesn't exist, but a cookie is present
-                if (Auth::guest() && $this->hasCookie()) {
-                    $this->debuglog("if user hasn't logged in and cookie exists, delete cookie");
-                    // get the user ID from cookie
-                    $userId = $this->getUserIdFromCookie();
-                    // delete the OTP requests from database for that specific user
-                    OneTimePassword::whereUserId($userId)->delete();
-                    // expire that cookie
+                $this->debuglog("otp doesn't exist");
+                // creating a new OTP login session
+                $otp = OneTimePassword::create([
+                "user_id" => $userId,
+                "status" => "waiting",
+                ]);
+                $this->debuglog("created otp for {$userId}");
+                // send the OTP to the user
+                if ($otp->send() == true) {
+                    $this->debuglog("otp send succeeded");
+                    // redirect to OTP verification screen
+                    return redirect(route('otp.view'));
+                } else {
+                    $this->debuglog("otp send failed");
+                    // otp send failed, expire the cookie if exists
                     $this->createExpiredCookie();
+                    // send the user to login screen with error
+                    return $this
+                    ->logout($otp)
+                    ->with(
+                        "message",
+                        __("laravel-otp-login::messages.service_not_responding")
+                    );
                 }
             }
-            $this->debuglog("returning next request");
-        // continue processing next request.
-            return $next($request);
-        } catch (\Throwable $ex) {
-            var_dump($ex->getMessage());
-            throw $ex;
+        } else {
+            $this->debuglog("willcheck failed");
+
+            // if an active session doesn't exist, but a cookie is present
+            if (Auth::guest() && $this->hasCookie()) {
+                $this->debuglog("if user hasn't logged in and cookie exists, delete cookie");
+                // get the user ID from cookie
+                $userId = $this->getUserIdFromCookie();
+                // delete the OTP requests from database for that specific user
+                OneTimePassword::whereUserId($userId)->delete();
+                // expire that cookie
+                $this->createExpiredCookie();
+            }
         }
+
+        $this->debuglog("returning next request");
+        // continue processing next request.
+        return $next($request);
     }
 
     /**
