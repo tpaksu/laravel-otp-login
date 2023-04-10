@@ -17,7 +17,7 @@ abstract class TestCase extends OrchestraTestCase
         parent::setUp();
         $this->loadLaravelMigrations(['--database' => 'testbench']);
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
-        $this->artisan('migrate:refresh', ['--database' => 'testbench'])->run();
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
     }
 
     /**
@@ -51,8 +51,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \tpaksu\LaravelOTPLogin\OTPServiceProvider::class,
-            \Orchestra\Database\ConsoleServiceProvider::class,
+            \tpaksu\LaravelOTPLogin\OTPServiceProvider::class
         ];
     }
 }
