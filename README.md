@@ -109,10 +109,10 @@ This line shows the length of the generated one time password's reference number
 'otp_reference_number_length' => 6,
 ```
 
-This defines the OTP validity timeout in seconds, currently set as 3 months.
+This defines the OTP validity timeout in seconds after creating it, currently set as 5 minutes.
 
 ```php
-'otp_timeout' => 7890000,
+'otp_timeout' => 300,
 ```
 
 This line shows the length of the generated one time password. It should be below 10 because of PHP's integer limit which is 2<sup>32</sup> (2,147,483,647) on 32-bit machines. It'll be more configurable in the later versions, but I don't think it'll be needed more than 10 digits for UX reasons.
@@ -206,8 +206,7 @@ namespace tpaksu\LaravelOTPLogin\Services;
 // - OR if you are writing your service in App\OTPServices folder
 namespace App\OTPServices;
 
-// Your user instance, change it if you are using a different model
-use App\User;
+use Illuminate\Auth\Authenticatable;
 
 // this is a must.
 use tpaksu\LaravelOTPLogin\ServiceInterface;
@@ -239,12 +238,12 @@ class MyMessagingService implements ServiceInterface
     /**
      * Sends the generated password to the user and returns if it's successful
      *
-     * @param App\User $user : The user to send the OTP to
-     * @param string $otp    : The One Time Password
-     * @param string $ref    : The reference number of this request
+     * @param Authenticatable $user The user to send the OTP to
+     * @param string $otp           The One Time Password
+     * @param string $ref           The reference number of this request
      * @return boolean
      */
-    public function sendOneTimePassword(User $user, $otp, $ref)
+    public function sendOneTimePassword(Authenticatable $user, $otp, $ref)
     {
         // this is where you send the $otp password SMS to the $user
         // get the phone number

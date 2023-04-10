@@ -2,7 +2,7 @@
 
 namespace tpaksu\LaravelOTPLogin\Services;
 
-use App\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use tpaksu\LaravelOTPLogin\ServiceInterface;
 
 /**
@@ -59,40 +59,60 @@ class BioTekno implements ServiceInterface
     /**
      * Sends the generated password to the user and returns if it's successful
      *
-     * @param App\User $user
+     * @param Authenticatable $user
      * @param string $otp
      * @param string $ref
      * @return boolean
      */
-    public function sendOneTimePassword(User $user, $otp, $ref)
+    public function sendOneTimePassword(Authenticatable $user, $otp, $ref)
     {
         // phone numbers need to be starting without a leading zero in this service
         // extract the phone number from the user
         $user_phone = data_get($user, $this->phone_column, false);
 
         // if phone number doesn't exist, return failed
-        if (!$user_phone) return false;
+        if (!$user_phone) {
+            return false;
+        }
 
         try {
-
             // prepare the request URL
-            $url = 'http://www.biotekno.biz:8080/SMS-Web/HttpSmsSend?' .
-                'Username=' . $this->username .
-                '&Password=' . $this->password .
-                '&Msisdns=' . $user_phone .
-                '&TransmissionID=' . $this->transmission_id .
-                '&Messages=' . urlencode(iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)));
+            $url = $this->buildURL(
+                $this->username,
+                $this->password,
+                $user_phone,
+                $this->transmission_id,
+                $otp,
+                $this->message
+            );
 
             // GET the response
-            $results = file_get_contents($url);
+            $results = $this->sendRequest($url);
 
             // check the result contains the succeeded flag
             return strpos($results, "Status=0") !== false;
-
-        } catch (\Exception $e) {
-
+        } catch (\Throwable $e) {
             // return false if any exception occurs
             return false;
         }
+    }
+
+    public function sendRequest($url)
+    {
+        return file_get_contents($url);
+    }
+
+    public function buildURL($username, $password, $phone, $transmission_id, $otp, $message)
+    {
+        return 'http://www.biotekno.biz:8080/SMS-Web/HttpSmsSend?' .
+            'Username=' . $username .
+            '&Password=' . $password .
+            '&Msisdns=' . $phone .
+            '&TransmissionID=' . $transmission_id .
+            '&Messages=' . urlencode(iconv(
+                "UTF-8",
+                "ASCII//TRANSLIT",
+                str_replace(":password", $otp, $message)
+            ));
     }
 }
