@@ -103,6 +103,12 @@ Otherwise, if it's in a table like `user_phones` linked to your `users` table, y
 'user_phone_field' => 'user_phone.phone',
 ```
 
+This line lets you define your user table's primary key. If your primary key is not id, You can edit this line to your own customized primary key.
+
+```php
+'user_id_field' => 'id',
+```
+
 This line shows the length of the generated one time password's reference number. See `otp_digit_length` setting description for limitations. It's not currently used in SMS but it's generated and saved to database. In later versions, I plan to implement it to the services.
 
 ```php
