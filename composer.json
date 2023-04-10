@@ -26,11 +26,11 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "orchestra/testbench": "*",
-        "orchestra/database": "*",
-        "rregeer/phpunit-coverage-check": "*",
-        "vimeo/psalm": "*"
+        "phpunit/phpunit": "^9.6",
+        "orchestra/testbench": "5.x-dev",
+        "jasonmccreary/laravel-test-assertions": "1.1.0",
+        "rregeer/phpunit-coverage-check": "^0.3.1",
+        "vimeo/psalm": "^5.9"
     },
     "scripts": {
         "test-coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-html ./coverage",
