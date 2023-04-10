@@ -31,7 +31,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        composer self-update 1.10.22
+        sudo composer self-update 1.10.22
         composer install --prefer-dist --no-progress
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
