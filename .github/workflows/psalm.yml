@@ -6,6 +6,9 @@ on:
       - '**.php'
       - 'psalm*'
       - 'composer.json'
+  push:
+    branches:
+      - master
 
 jobs:
   psalm:

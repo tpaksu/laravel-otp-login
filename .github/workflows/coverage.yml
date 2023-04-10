@@ -5,6 +5,9 @@ on:
     paths:
       - '**.php'
       - 'composer.json'
+  push:
+    branches:
+      - master
 
 jobs:
   coverage:
