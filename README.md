@@ -109,7 +109,13 @@ Otherwise, if it's in a table like `user_phones` linked to your `users` table, y
 'user_phone_field' => 'user_phone.phone',
 ```
 
-This line lets you define your user table's primary key. If your primary key is not id, You can edit this line to your own customized primary key.
+This line lets you define your user table's name. If you're using a different table than `users`, you can edit this line to point that. Needed for the migrations to reference the correct primary key. Note that you can change the model you're using for authentication by modifying the `auth.providers.users.model`. That's already a Laravel feature.  
+
+```php
+'users_table' => 'users',
+```
+
+This line lets you define your user table's primary key. If your primary key is not id, you can edit this line to your own customized primary key.
 
 ```php
 'user_id_field' => 'id',
