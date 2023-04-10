@@ -9,6 +9,7 @@ use tpaksu\LaravelOTPLogin\Services\Twilio;
 class TwilioTest extends TestCase
 {
     protected $user;
+    protected $instance;
 
     protected function setUp(): void
     {
@@ -27,27 +28,32 @@ class TwilioTest extends TestCase
             'email' => 'dummy@email.com',
             'phone' => 'dummy_phone',
         ]);
+        if (version_compare(app()->version(), '10.0', '>=')) {
+            $this->instance = $this->getMockBuilder(Twilio::class)->onlyMethods(['sendRequest'])->getMock();
+        } else {
+            $this->instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
+        }
     }
 
     public function testSendMessage()
     {
-        $instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
-        $instance->expects($this->once())
+
+        $this->instance->expects($this->once())
             ->method('sendRequest')
             ->with('https://api.twilio.com/2010-04-01/Accounts/mock_account_sid/Messages.json', 'dummy_phone', '123456')
             ->willReturn('"status": "queued",');
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertTrue($result);
     }
 
     public function testSendMessageException()
     {
         $instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
-        $instance->expects($this->once())
+        $this->instance->expects($this->once())
             ->method('sendRequest')
             ->with('https://api.twilio.com/2010-04-01/Accounts/mock_account_sid/Messages.json', 'dummy_phone', '123456')
             ->willThrowException(new \Exception());
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 
@@ -55,9 +61,9 @@ class TwilioTest extends TestCase
     {
         $this->user->phone = '';
         $instance = $this->getMockBuilder(Twilio::class)->setMethods(['sendRequest'])->getMock();
-        $instance->expects($this->never())
+        $this->instance->expects($this->never())
             ->method('sendRequest');
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 }

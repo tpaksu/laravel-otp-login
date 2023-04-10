@@ -9,6 +9,7 @@ use tpaksu\LaravelOTPLogin\Services\BioTekno;
 class BioTeknoTest extends TestCase
 {
     protected $user;
+    protected $instance;
 
     protected function setUp(): void
     {
@@ -28,12 +29,20 @@ class BioTeknoTest extends TestCase
             'email' => 'dummy@email.com',
             'phone' => 'dummy_phone',
         ]);
+        if (version_compare(app()->version(), '10.0', '>=')) {
+            $this->instance = $this->getMockBuilder(BioTekno::class)
+            ->onlyMethods(['sendRequest', 'buildURL'])
+            ->getMock();
+        } else {
+            $this->instance = $this->getMockBuilder(BioTekno::class)
+            ->setMethods(['sendRequest', 'buildURL'])
+            ->getMock();
+        }
     }
 
     public function testSendMessage()
     {
-        $instance = $this->getMockBuilder(BioTekno::class)->setMethods(['sendRequest', 'buildURL'])->getMock();
-        $instance->expects($this->once())
+        $this->instance->expects($this->once())
             ->method('buildURL')
             ->with(
                 'mock_username',
@@ -44,18 +53,17 @@ class BioTeknoTest extends TestCase
                 trans('laravel-otp-login::messages.otp_message')
             )
             ->willReturn('test_url');
-        $instance->expects($this->once())
+        $this->instance->expects($this->once())
             ->method('sendRequest')
             ->with('test_url')
             ->willReturn('Status=0');
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertTrue($result);
     }
 
     public function testSendMessageException()
     {
-        $instance = $this->getMockBuilder(BioTekno::class)->setMethods(['sendRequest', 'buildURL'])->getMock();
-        $instance->expects($this->once())
+        $this->instance->expects($this->once())
             ->method('buildURL')
             ->with(
                 'mock_username',
@@ -66,11 +74,11 @@ class BioTeknoTest extends TestCase
                 trans('laravel-otp-login::messages.otp_message')
             )
             ->willThrowException(new \Exception());
-        $instance->expects($this->never())
+        $this->instance->expects($this->never())
             ->method('sendRequest')
             ->with('test_url')
             ->willReturn('Status=0');
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 
@@ -78,12 +86,11 @@ class BioTeknoTest extends TestCase
     public function testSendMessageNoPhone()
     {
         $this->user->phone = '';
-        $instance = $this->getMockBuilder(BioTekno::class)->setMethods(['sendRequest', 'buildURL'])->getMock();
-        $instance->expects($this->never())
+        $this->instance->expects($this->never())
             ->method('buildURL');
-        $instance->expects($this->never())
+        $this->instance->expects($this->never())
             ->method('sendRequest');
-        $result = $instance->sendOneTimePassword($this->user, "123456", "654321");
+        $result = $this->instance->sendOneTimePassword($this->user, "123456", "654321");
         $this->assertFalse($result);
     }
 
