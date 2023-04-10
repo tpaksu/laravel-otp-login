@@ -15,8 +15,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "tpaksu\\LaravelOTPLogin\\Tests\\": "tests/",
-            "tpaksu\\LaravelOTPLogin\\Tests\\Helpers": "tests/Helpers"
+            "tpaksu\\LaravelOTPLogin\\Tests\\": "tests/"
         }
     },
     "extra": {
