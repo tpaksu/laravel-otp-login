@@ -1,15 +1,14 @@
-name: Psalm
+name: Coverage
 
 on:
   pull_request:
     paths:
       - '**.php'
-      - 'psalm*'
       - 'composer.json'
 
 jobs:
-  psalm:
-    name: Coverage check
+  coverage:
+    name: Check coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
