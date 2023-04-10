@@ -52,8 +52,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  composer self-update
-                  composer config --no-plugins allow-plugins.kylekatarnls/update-helper true
+                  composer self-update 1.10.22
                   composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update --dev
                   composer update --prefer-stable --prefer-dist --no-interaction --dev
                   composer dumpautoload
