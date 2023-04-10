@@ -7,7 +7,7 @@ on:
       - 'composer.json'
   push:
     branches:
-      - master
+      - develop
 
 jobs:
   coverage:
