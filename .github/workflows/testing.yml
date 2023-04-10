@@ -48,11 +48,11 @@ jobs:
               with:
                   php-version: ${{ matrix.php }}
                   extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-                  coverage: none
+                  coverage: xdebug2
+                  tools: composer:1.10.22
 
             - name: Install dependencies
               run: |
-                  composer self-update 1.10.22
                   composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update --dev
                   composer update --prefer-stable --prefer-dist --no-interaction --dev
                   composer dumpautoload

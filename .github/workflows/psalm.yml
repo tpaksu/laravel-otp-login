@@ -19,11 +19,10 @@ jobs:
         with:
           php-version: '8.1'
           coverage: none
+          tools: psalm, composer:1.10.22
 
       - name: Install composer dependencies
-        run: |
-          composer self-update 1.10.22
-          composer install -n --prefer-dist
+        run: composer install -n --prefer-dist
 
       - name: Run Psalm
         run: ./vendor/bin/psalm
