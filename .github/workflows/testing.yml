@@ -50,8 +50,8 @@ jobs:
 
             -   name: Install dependencies
                 run: |
-                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench" "phpunit/phpunit" "vimeo/psalm" --no-interaction --no-update
-                    composer update --prefer-stable --prefer-dist --no-interaction --no-suggest
+                    composer require --dev "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench" "phpunit/phpunit" "vimeo/psalm" --no-interaction --no-update
+                    composer update --prefer-stable --no-interaction
 
             -   name: Execute tests
                 run: vendor/bin/phpunit
