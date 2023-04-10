@@ -54,8 +54,8 @@ jobs:
               run: |
                   composer self-update
                   composer config --no-plugins allow-plugins.kylekatarnls/update-helper true
-                  composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-                  composer update --prefer-stable --prefer-dist --no-interaction
+                  composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update --dev
+                  composer update --prefer-stable --prefer-dist --no-interaction --dev
                   composer dumpautoload
 
             - name: Execute tests
