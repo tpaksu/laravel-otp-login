@@ -51,7 +51,8 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \tpaksu\LaravelOTPLogin\OTPServiceProvider::class
+            \tpaksu\LaravelOTPLogin\OTPServiceProvider::class,
+            \Orchestra\Database\ConsoleServiceProvider::class,
         ];
     }
 }
