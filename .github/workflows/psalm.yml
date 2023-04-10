@@ -22,7 +22,7 @@ jobs:
           tools: psalm, composer:1.10.22
 
       - name: Install composer dependencies
-        run: composer install -n --prefer-dist
+        run: composer install --no-interaction --prefer-stable
 
       - name: Run Psalm
-        run: ./vendor/bin/psalm
+        run: ./vendor/bin/psalm --no-cache
