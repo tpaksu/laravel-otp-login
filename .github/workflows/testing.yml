@@ -69,10 +69,7 @@ jobs:
                     extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
                     coverage: none
 
-            -   name: Install dependencies
-                run: |
-                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "phpunit/phpunit:${{ matrix.phpunit }}" "vimeo/psalm:${{ matrix.psalm }}" --no-interaction --update-with-dependencies
-                    composer update --prefer-stable --prefer-dist --no-interaction --with-all-dependencies
+            - uses: "ramsey/composer-install@v2"
 
             -   name: Execute tests
                 run: vendor/bin/phpunit
