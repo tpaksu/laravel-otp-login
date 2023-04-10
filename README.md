@@ -279,6 +279,11 @@ class MyMessagingService implements ServiceInterface
 If you need to modify a service included in this package, you can check your `App\OTPServices` folder and you'll see a copy of each service class in this folder. Change the namespaces from `tpaksu\LaravelOTPLogin\Services` to `App\OTPServices` and in the configuration file, change the class path to the modified file. This will be enough to use the modified version of this class.
 
 
+## Troubleshooting
+
+- Open `vendor/tpaksu/laravel-otp-login/src/LoginMiddleware.php` and set `private $debug` to `true`. This will add debug messages to your log file.
+- If the service is always bypassing the otp screen, check if your route has the `auth` middleware.
+
 ## License
 
 The MIT License (MIT)
