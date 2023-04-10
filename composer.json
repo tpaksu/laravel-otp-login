@@ -28,6 +28,7 @@
     "require-dev": {
         "phpunit/phpunit": "*",
         "orchestra/testbench": "*",
+        "orchestra/database": "*",
         "rregeer/phpunit-coverage-check": "*",
         "vimeo/psalm": "*"
     },
