@@ -14,7 +14,8 @@ class CreateOtpLogsTable extends Migration
     public function up()
     {
         Schema::create(
-            'one_time_password_logs', function (Blueprint $table) {
+            'one_time_password_logs',
+            function (Blueprint $table) {
                 $table->bigIncrements('id');
                 if (version_compare(app()->version(), '5.8.0', '<')) {
                     $table->unsignedInteger("user_id")->index();
@@ -29,10 +30,11 @@ class CreateOtpLogsTable extends Migration
         );
 
         Schema::table(
-            'one_time_password_logs', function (Blueprint $table) {
+            'one_time_password_logs',
+            function (Blueprint $table) {
                 $usersTable = config('otp.users_table', 'users');
                 $userIdField = config('otp.user_id_field', 'id');
-                $table->foreign('user_id') ->references($userIdField)->on($usersTable)->onDelete('cascade');
+                $table->foreign('user_id')->references($userIdField)->on($usersTable)->onDelete('cascade');
             }
         );
     }

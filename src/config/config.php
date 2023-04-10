@@ -1,4 +1,5 @@
 <?php
+
 return [
     'otp_service_enabled' => true,
     'otp_default_service' => env("OTP_SERVICE", "nexmo"),
@@ -26,7 +27,7 @@ return [
     'user_phone_field' => 'phone',
     'user_id_field' => 'id',
     'otp_reference_number_length' => 6,
-    'otp_timeout' => 7890000,
+    'otp_timeout' => 300,
     'otp_digit_length' => 6,
     'encode_password' => false,
 ];

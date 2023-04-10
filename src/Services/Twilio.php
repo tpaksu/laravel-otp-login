@@ -2,7 +2,7 @@
 
 namespace tpaksu\LaravelOTPLogin\Services;
 
-use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable;
 use tpaksu\LaravelOTPLogin\ServiceInterface;
 
 /**
@@ -29,7 +29,7 @@ class Twilio implements ServiceInterface
     /**
      * The message to be send to the user
      *
-     * @var [type]
+     * @var string
      */
     private $message;
 
@@ -73,42 +73,46 @@ class Twilio implements ServiceInterface
         $user_phone = data_get($user, $this->phone_column, false);
 
         // if the phone isn't set, return false
-        if (!$user_phone) return false;
+        if (!$user_phone) {
+            return false;
+        }
 
         try {
-
             // prepare the request url
             $url = "https://api.twilio.com/2010-04-01/Accounts/" . $this->api_account_sid . "/Messages.json";
 
-            // prepare the CURL channel
-            $ch = curl_init($url);
-
-            // set the request type to POST
-            curl_setopt($ch, CURLOPT_POST, 1);
-
-            // prepare the body data
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
-                "Body" => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)),
-                "From" => $this->from,
-                "To" => $user_phone
-            ]);
-
-            // add the authentication info
-            curl_setopt($ch, CURLOPT_USERPWD, $this->api_account_sid . ":" . $this->api_auth_token);
-
-            // should return the response
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            // execute the request and get the response
-            $response = curl_exec($ch);
+            $response = $this->sendRequest($url, $user_phone, $otp);
 
             // check if the response contains the success flag
-            return strpos($response, "\"status\": \"queued\",") !== false;
-
+            return strpos($response, '"status": "queued",') !== false;
         } catch (\Exception $e) {
-
             // return false if any exception occurs
             return false;
         }
+    }
+
+    public function sendRequest($url, $user_phone, $otp)
+    {
+         // prepare the CURL channel
+         $ch = curl_init($url);
+
+         // set the request type to POST
+         curl_setopt($ch, CURLOPT_POST, 1);
+
+         // prepare the body data
+         curl_setopt($ch, CURLOPT_POSTFIELDS, [
+             "Body" => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message)),
+             "From" => $this->from,
+             "To" => $user_phone
+         ]);
+
+         // add the authentication info
+         curl_setopt($ch, CURLOPT_USERPWD, $this->api_account_sid . ":" . $this->api_auth_token);
+
+         // should return the response
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+         // execute the request and get the response
+         return curl_exec($ch);
     }
 }

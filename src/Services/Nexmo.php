@@ -2,7 +2,7 @@
 
 namespace tpaksu\LaravelOTPLogin\Services;
 
-use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable;
 use tpaksu\LaravelOTPLogin\ServiceInterface;
 
 /**
@@ -29,7 +29,7 @@ class Nexmo implements ServiceInterface
     /**
      * The message to be send to the user
      *
-     * @var [type]
+     * @var string
      */
     private $message;
 
@@ -73,34 +73,43 @@ class Nexmo implements ServiceInterface
         $user_phone = data_get($user, $this->phone_column, false);
 
         // if the phone isn't set, return false
-        if (!$user_phone) return false;
+        if (!$user_phone) {
+            return false;
+        }
 
         try {
             // prepare the request url
-            $url = 'https://rest.nexmo.com/sms/json?' . http_build_query([
-                'api_key' => $this->api_key,
-                'api_secret' => $this->api_secret,
-                'to' => $user_phone,
-                'from' => $this->from,
-                'text' => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $this->message))
-            ]);
-
+            $url = $this->buildURL($this->api_key, $this->api_secret, $user_phone, $this->from, $otp, $this->message);
             // prepare the CURL channel
-            $ch = curl_init($url);
-
-            // should return the transfer
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-            // execute the request
-            $response = curl_exec($ch);
-
+            $response = $this->sendRequest($url);
             // check if response contains the succeeded flag
-            return strpos($response, "\"status\": \"0\",") !== false;
-
+            return strpos($response, '"status": "0",') !== false;
         } catch (\Exception $e) {
-
             // return false if any exception occurs
             return false;
         }
+    }
+
+    public function buildURL($api_key, $api_secret, $user_phone, $from, $otp, $message)
+    {
+        return 'https://rest.nexmo.com/sms/json?' . http_build_query([
+            'api_key' => $api_key,
+            'api_secret' => $api_secret,
+            'to' => $user_phone,
+            'from' => $from,
+            'text' => iconv("UTF-8", "ASCII//TRANSLIT", str_replace(":password", $otp, $message))
+        ]);
+    }
+
+    public function sendRequest($url)
+    {
+         // prepare the CURL channel
+         $ch = curl_init($url);
+
+         // should return the transfer
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+         // execute the request
+         return curl_exec($ch);
     }
 }
