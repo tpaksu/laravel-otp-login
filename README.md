@@ -43,8 +43,9 @@ Publish files with:
 ```
 
 > **Warning**: After publishing files, the package will continue to use the vendor copies of services. To change this to use the published ones in `app/Http/OtpServices` folder; 
-> - Change the namespaces of the published services to `App\Http\OtpServices`, 
+> - Change the namespaces of the published services to `App\OtpServices`, 
 > - Change the references in `config/otp.php` in the `services` array to point the published services,
+> - Run `composer dumpautoload`.
 > - Run `php artisan config:cache`.
 
 or by using only `php artisan vendor:publish` and select the `tpaksu\LaravelOTPLogin\OTPServiceProvider` from the outputted list.
