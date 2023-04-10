@@ -28,7 +28,6 @@
     "require-dev": {
         "phpunit/phpunit": "*",
         "orchestra/testbench": "*",
-        "jasonmccreary/laravel-test-assertions": "*",
         "rregeer/phpunit-coverage-check": "*",
         "vimeo/psalm": "*"
     },

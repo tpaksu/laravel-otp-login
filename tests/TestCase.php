@@ -8,12 +8,9 @@ use Illuminate\Support\Facades\Config;
 use tpaksu\LaravelOTPLogin\OTPServiceProvider;
 use tpaksu\LaravelOTPLogin\Tests\Helpers\User;
 use Orchestra\Testbench\TestCase as Orchestra;
-use JMac\Testing\Traits\AdditionalAssertions;
 
 abstract class TestCase extends Orchestra
 {
-    use AdditionalAssertions;
-
     /**
      * Set up
      */

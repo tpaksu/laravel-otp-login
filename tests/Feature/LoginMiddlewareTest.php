@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Routing\RouteCollection;
 
 class LoginMiddlewareTest extends TestCase
 {
@@ -25,12 +24,14 @@ class LoginMiddlewareTest extends TestCase
 
     public function testRouteUsesWebAuthMiddleware()
     {
-        $this->assertRouteUsesMiddleware(
-            'test.route',
+        $router = app('router');
+        $routes = $router->getRoutes()->getRoutesByName();
+        $this->assertEquals(
+            $routes['test.route']->middleware(),
             [LoginMiddleware::class, 'auth']
         );
-        $this->assertRouteUsesMiddleware(
-            'test.route-no-auth',
+        $this->assertEquals(
+            $routes['test.route-no-auth']->middleware(),
             [LoginMiddleware::class]
         );
     }
@@ -270,19 +271,16 @@ class LoginMiddlewareTest extends TestCase
 
     private function prepareRoutes()
     {
-        $router = app("router");
-        Route::middleware([LoginMiddleware::class, 'auth'])->get('/test-route', function () {
+        $routeCollection = app("router")->getRoutes();
+        $routeCollection->add(Route::middleware([LoginMiddleware::class, 'auth'])->get('/test-route', function () {
             return "logged in";
-        })->name('test.route');
-        Route::middleware([LoginMiddleware::class, 'auth'])->get('/login', function () {
+        })->name('test.route'));
+        $routeCollection->add(Route::middleware([LoginMiddleware::class, 'auth'])->get('/login', function () {
             return "login form";
-        })->name('login');
-        Route::middleware([LoginMiddleware::class])->get('/test-route-no-auth', function () {
+        })->name('login'));
+        $routeCollection->add(Route::middleware([LoginMiddleware::class])->get('/test-route-no-auth', function () {
             return "logged in no auth";
-        })->name('test.route-no-auth');
-        if (\method_exists(RouteCollection::class, 'compile')) {
-            $router->getRoutes()->compile();
-        }
+        })->name('test.route-no-auth'));
     }
 
     private function prepareExpiredRoute()
