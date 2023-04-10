@@ -50,6 +50,7 @@ jobs:
 
             - name: Install dependencies
               run: |
+                  composer self-update
                   composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
                   composer update --prefer-stable --prefer-dist --no-interaction
 
