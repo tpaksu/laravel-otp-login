@@ -21,7 +21,9 @@ jobs:
           coverage: none
 
       - name: Install composer dependencies
-        run: composer install -n --prefer-dist
+        run: |
+          composer self-update 1.10.22
+          composer install -n --prefer-dist
 
       - name: Run Psalm
         run: ./vendor/bin/psalm --threads=2 --output-format=github
